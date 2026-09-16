@@ -9,11 +9,10 @@ export default function LoginScreen({ login }) {
 
   return (
     <div className="login-screen">
-      <img src="/wallpaper.jpg" className="login-wall" alt="" />
+      <img src="/wallpaper.jpg" className="login-wall" alt=""  />
 
       <div className="login-card">
-         <img src="/phoenix.svg" className="lock-logo" alt="" />
-
+         <img src="/phoenix.svg" className="lock-logo" alt=""  /> 
         <h2>Mubin</h2>
         <p>VOS</p>
 
