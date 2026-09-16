@@ -150,11 +150,13 @@ export default function App() {
 
       {/* Top Bar */}
       <TopBar
-        volume={volume}
-        setVolume={setVolume}
-        wifi={wifi}
-        airplane={airplane}
-      />
+  volume={volume}
+  setVolume={setVolume}
+  wifi={wifi}
+  setWifi={setWifi}
+  airplane={airplane}
+  setAirplane={setAirplane}
+/>
 
       {/* Desktop Icons */}
       <div className="icons">
