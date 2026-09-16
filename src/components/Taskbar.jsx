@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Search, Folder, Terminal } from "lucide-react";
-import { FolderOpen } from "lucide-react";
+
 export default function Taskbar({
   toggle,
   explorer,
   terminal,
   restore,
   restoreTerminal,
+  search,
+  setSearch,
 }) {
   const [time, setTime] = useState("");
 
@@ -37,10 +39,16 @@ export default function Taskbar({
         />
       </button>
 
-      {/* Search Bar */}
+      {/* Search */}
       <div className="search">
-        <Search size={18} />
-        <span>Search apps...</span>
+        <Search size={18} color="#94A3B8" />
+
+        <input
+          type="text"
+          placeholder="Search apps..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {/* Running Apps */}

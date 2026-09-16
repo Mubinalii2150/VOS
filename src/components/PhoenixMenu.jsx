@@ -12,6 +12,7 @@ export default function PhoenixMenu({
   openTerminal,
 }) {
   return (
+    
     <div className="phoenix-menu">
       <div className="menu-item" onClick={openExplorer}>
   <Folder size={20}/>

@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import {
   FolderOpen,
   Monitor,
   Settings,
   Terminal,
+  Archive,
 } from "lucide-react";
 
 import TopBar from "./components/TopBar";
@@ -13,6 +15,7 @@ import DesktopIcon from "./components/DesktopIcon";
 import Window from "./components/Window";
 import FileExplorer from "./components/FileExplorer";
 import ComputerApp from "./components/ComputerApp";
+import FileExtractor from "./components/FileExtractor";
 import ContextMenu from "./components/ContextMenu";
 import SettingsApp from "./components/SettingsApp";
 import TerminalApp from "./components/TerminalApp";
@@ -21,32 +24,30 @@ import LoginScreen from "./components/LoginScreen";
 import BootScreen from "./components/BootScreen";
 
 export default function App() {
-  
-  // Boot
+  /* ---------------- Boot & Login ---------------- */
   const [booting, setBooting] = useState(true);
-  
-  // Login
   const [locked, setLocked] = useState(true);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // Desktop
+  /* ---------------- Desktop ---------------- */
   const [menu, setMenu] = useState(false);
+  const [search, setSearch] = useState("");
   const [theme, setTheme] = useState("dark");
   const [wallpaper, setWallpaper] = useState("/wallpaper.jpg");
 
-  // System States
+  /* ---------------- System ---------------- */
   const [volume, setVolume] = useState(70);
   const [wifi, setWifi] = useState(true);
   const [airplane, setAirplane] = useState(false);
 
-  // Context Menu
+  /* ---------------- Context Menu ---------------- */
   const [ctx, setCtx] = useState({
     show: false,
     x: 0,
     y: 0,
   });
 
-  // Windows
+  /* ---------------- Windows ---------------- */
   const [explorer, setExplorer] = useState({
     open: false,
     minimized: false,
@@ -67,7 +68,12 @@ export default function App() {
     minimized: false,
   });
 
-  // ---------- Functions ----------
+  const [extractor, setExtractor] = useState({
+    open: false,
+    minimized: false,
+  });
+
+  /* ---------------- Open Functions ---------------- */
 
   const openExplorer = () => {
     setExplorer({ open: true, minimized: false });
@@ -89,17 +95,34 @@ export default function App() {
     setMenu(false);
   };
 
+  const openExtractor = () => {
+    setExtractor({ open: true, minimized: false });
+    setMenu(false);
+  };
+
   const openContext = (e) => {
     e.preventDefault();
+
     setCtx({
       show: true,
       x: e.clientX,
       y: e.clientY,
     });
+
     setMenu(false);
   };
 
-  // ---------- Screens ----------
+  /* ---------------- Search Apps ---------------- */
+
+  const apps = [
+    { name: "Files", action: openExplorer },
+    { name: "Computer", action: openComputer },
+    { name: "Settings", action: openSettings },
+    { name: "Terminal", action: openTerminal },
+    { name: "Extractor", action: openExtractor },
+  ];
+
+  /* ---------------- Boot Screens ---------------- */
 
   if (booting)
     return <BootScreen finish={() => setBooting(false)} />;
@@ -110,7 +133,7 @@ export default function App() {
   if (!loggedIn)
     return <LoginScreen login={() => setLoggedIn(true)} />;
 
-  // ---------- Desktop ----------
+  /* ---------------- Desktop ---------------- */
 
   return (
     <div
@@ -122,7 +145,7 @@ export default function App() {
       <img
         src={wallpaper}
         className="wallpaper"
-        alt="Wallpaper"
+        alt="wallpaper"
       />
 
       {/* Top Bar */}
@@ -158,7 +181,37 @@ export default function App() {
           name="Terminal"
           onOpen={openTerminal}
         />
+
+        <DesktopIcon
+          icon={Archive}
+          name="Extractor"
+          onOpen={openExtractor}
+        />
       </div>
+
+      {/* Search Results */}
+      {search !== "" && (
+        <div className="search-results">
+          {apps
+            .filter((app) =>
+              app.name
+                .toLowerCase()
+                .includes(search.toLowerCase())
+            )
+            .map((app) => (
+              <div
+                key={app.name}
+                className="search-item"
+                onClick={() => {
+                  app.action();
+                  setSearch("");
+                }}
+              >
+                {app.name}
+              </div>
+            ))}
+        </div>
+      )}
 
       {/* Start Menu */}
       {menu && (
@@ -278,6 +331,27 @@ export default function App() {
         </Window>
       )}
 
+      {/* Extractor */}
+      {extractor.open && !extractor.minimized && (
+        <Window
+          title="File Extractor"
+          onClose={() =>
+            setExtractor({
+              open: false,
+              minimized: false,
+            })
+          }
+          onMinimize={() =>
+            setExtractor({
+              open: true,
+              minimized: true,
+            })
+          }
+        >
+          <FileExtractor />
+        </Window>
+      )}
+
       {/* Taskbar */}
       <Taskbar
         toggle={() => setMenu(!menu)}
@@ -295,6 +369,8 @@ export default function App() {
             minimized: false,
           })
         }
+        search={search}
+        setSearch={setSearch}
       />
     </div>
   );

@@ -14,6 +14,15 @@ export default function SettingsApp({
 }) {
   const [page, setPage] = useState("appearance");
 
+  const [airGap, setAirGap] = useState(true);
+const [sqlite, setSqlite] = useState(true);
+const [autoSave, setAutoSave] = useState(false);
+const [saved, setSaved] = useState(false);
+
+const saveSecurity = () => {
+  setSaved(true);
+  setTimeout(() => setSaved(false), 2500);
+};
   const wallpapers = [
     "/wall3.jpg",
     "/wallpaper.jpg",
@@ -29,7 +38,9 @@ export default function SettingsApp({
         <button onClick={() => setPage("sound")}>Sound</button>
         <button onClick={() => setPage("clock")}> Date & Time</button>
         <button onClick={() => setPage("network")}> Network & Internet</button>
+        <button onClick={() => setPage("security")}>System & Security</button>
         <button onClick={() => setPage("account")}> Account</button>
+        
       </div>
 
       <div className="settings-content">
@@ -188,6 +199,63 @@ export default function SettingsApp({
             </div>
           </>
         )}
+        {page === "security" && (
+  <>
+    <h2>System & Security Configuration</h2>
+
+    <div className="security-card">
+      <div>
+        <h3>Air-Gapped Isolation Protocol</h3>
+        <p>Disconnects all external network communication.</p>
+      </div>
+
+      <button
+        className={`toggle-btn ${airGap ? "on" : "off"}`}
+        onClick={() => setAirGap(!airGap)}
+      >
+        {airGap ? "ON" : "OFF"}
+      </button>
+    </div>
+
+    <div className="security-card">
+      <div>
+        <h3>SQLite Local Evidence Vault</h3>
+        <p>Store forensic evidence only in local encrypted database.</p>
+      </div>
+
+      <button
+        className={`toggle-btn ${sqlite ? "on" : "off"}`}
+        onClick={() => setSqlite(!sqlite)}
+      >
+        {sqlite ? "ON" : "OFF"}
+      </button>
+    </div>
+
+    <div className="security-card">
+      <div>
+        <h3>Auto Save Intercept Analysis</h3>
+        <p>Automatically preserve analyzed packets & reports.</p>
+      </div>
+
+      <button
+        className={`toggle-btn ${autoSave ? "on" : "off"}`}
+        onClick={() => setAutoSave(!autoSave)}
+      >
+        {autoSave ? "ON" : "OFF"}
+      </button>
+    </div>
+
+    <button className="save-config" onClick={saveSecurity}>
+      Save Configuration
+    </button>
+
+    {saved && (
+      <div className="config-saved">
+        ✓ Security configuration saved successfully.
+      </div>
+    )}
+  </>
+)}
       </div>
     </div>
   );
