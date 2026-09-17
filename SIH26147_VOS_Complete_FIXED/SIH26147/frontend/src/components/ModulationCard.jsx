@@ -1,0 +1,1 @@
+export default function ModulationCard({data}){return <Card title="Modulation Classification"><b>{data.classification}</b><span>{(data.confidence*100).toFixed(1)}% confidence</span></Card>} function Card(p){return <section className="card"><h3>{p.title}</h3>{p.children}</section>}

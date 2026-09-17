@@ -1,0 +1,1 @@
+import React from "react"; export default function SpectrogramChart({data}){let max=Math.max(1,...(data.power_db||[]).flat().map(Math.abs)); return <div className="spectro">{(data.power_db||[]).map((row,i)=><div key={i} className="specrow">{row.map((v,j)=><i key={j} style={{opacity:Math.min(1,Math.abs(v)/max)}}/>)}</div>)}</div>}

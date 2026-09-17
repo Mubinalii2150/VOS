@@ -1,0 +1,1 @@
+export default function SignalInfoCard({data}){return <section className="card"><h3>Signal Features</h3><div className="grid">{Object.entries(data||{}).map(([k,v])=><div key={k}><small>{k.replaceAll("_"," ")}</small><strong>{typeof v==="number"?v.toFixed(4):String(v)}</strong></div>)}</div></section>}

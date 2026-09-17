@@ -1,0 +1,1 @@
+export default function FECCard({data}){return <section className="card"><h3>FEC Analysis</h3><b>{data.classification}</b><p>Confidence: {(data.confidence*100).toFixed(1)}%</p>{(data.candidates||[]).map((x,i)=><small key={i}>{x.code}: {(x.confidence*100).toFixed(1)}%</small>)}</section>}
