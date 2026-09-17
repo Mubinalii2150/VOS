@@ -1,0 +1,8 @@
+===== SIGNAL PROCESSING REPORT =====
+Input File: signal.wav
+Sample Rate: 44100 Hz
+Total Samples: 132300
+Detected Frequency: 2000.0 Hz
+Bandwidth: 1005.33 Hz
+SNR: 0.00 dB
+Processing Status: Complete

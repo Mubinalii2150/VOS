@@ -1,0 +1,12 @@
+===== SIGNAL ANALYSIS REPORT =====
+
+Input File: output/test_bpsk.npy
+Total Samples: 400
+Mean Amplitude: 1.0000
+Amplitude STD: 0.0000
+I STD: 0.9798
+Q STD: 0.0000
+
+Detected Modulation: BPSK
+Recovered Bits: 40
+Recovered Message: HELLO

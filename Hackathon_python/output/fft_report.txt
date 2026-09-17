@@ -1,0 +1,5 @@
+===== FFT ANALYSIS REPORT =====
+Total Samples: 132300
+Sample Rate: 44100 Hz
+Dominant Frequency: 2000.00 Hz
+Estimated Bandwidth: 4000.67 Hz
