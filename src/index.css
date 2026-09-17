@@ -2517,3 +2517,352 @@ height:70px;
   color:#CBD5E1;
   margin:18px 0 10px;
 }
+/* =========================
+   VOS FILE EXPLORER
+========================= */
+
+.window-body{
+  height:calc(100% - 48px);
+  overflow:hidden;
+}
+
+.explorer{
+  width:100%;
+  height:100%;
+  display:flex;
+  background:#071224;
+  overflow:hidden;
+}
+
+/* Sidebar */
+
+.explorer-sidebar{
+  width:190px;
+  min-width:190px;
+  background:#0D1830;
+  border-right:1px solid rgba(255,255,255,.06);
+  padding:16px 14px;
+  display:flex;
+  flex-direction:column;
+}
+
+.side-title{
+  color:#64748B;
+  font-size:11px;
+  letter-spacing:2px;
+  margin-bottom:14px;
+}
+
+.side-btn{
+  width:100%;
+  height:44px;
+  border:none;
+  background:transparent;
+  color:#E2E8F0;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:0 12px;
+  cursor:pointer;
+  margin-bottom:6px;
+  transition:.25s;
+}
+
+.side-btn:hover{
+  background:#142543;
+}
+
+.side-btn.active{
+  background:rgba(0,245,212,.12);
+  border:1px solid rgba(0,245,212,.35);
+  color:#00F5D4;
+}
+
+/* Storage */
+
+.storage-box{
+  margin-top:auto;
+  background:#122241;
+  border-radius:14px;
+  padding:14px;
+}
+
+.storage-box span{
+  color:#F8FAFC;
+  font-size:13px;
+}
+
+.storage-bar{
+  height:7px;
+  background:#1E293B;
+  border-radius:20px;
+  margin:10px 0;
+}
+
+.storage-fill{
+  width:48%;
+  height:100%;
+  border-radius:20px;
+  background:linear-gradient(90deg,#00F5D4,#7C3AED);
+}
+
+.storage-box small{
+  color:#94A3B8;
+}
+
+/* Main */
+
+.explorer-main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  
+}
+
+/* Toolbar */
+
+.toolbar{
+  height:58px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.tool-btn{
+  width:36px;
+  height:36px;
+  border:none;
+  border-radius:10px;
+  background:#122241;
+  color:#E2E8F0;
+  cursor:pointer;
+  
+}
+
+.tool-btn:hover{
+  background:#1B3158;
+  
+}
+
+.path-bar{
+  flex:1;
+  height:38px;
+  background:#122241;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+  color:#E2E8F0;
+}
+
+.search-box{
+  width:210px;
+  height:38px;
+  background:#122241;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+}
+
+.search-box input{
+  width:100%;
+  background:none;
+  border:none;
+  outline:none;
+  color:white;
+  font-size:14px;
+  ;
+}
+
+/* Grid */
+
+.file-grid{
+  flex:1;
+  padding:18px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:18px;
+  overflow:auto;
+  
+}
+
+.file-card{
+  height:145px;
+  background:#0F1E39;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.file-card:hover{
+  transform:translateY(-4px);
+  border-color:#00F5D4;
+  box-shadow:0 0 18px rgba(0,245,212,.15);
+}
+
+.folder-icon{
+  color:#00F5D4;
+  margin-bottom:14px;
+}
+
+.file-card h4{
+  color:#F8FAFC;
+  margin:0;
+  font-size:15px;
+}
+
+.file-card span{
+  color:#94A3B8;
+  font-size:12px;
+  margin-top:6px;
+  
+}
+
+/* List */
+
+.file-list{
+  flex:1;
+  overflow:auto;
+  padding:16px;
+
+}
+
+.list-row{
+  height:60px;
+  background:#0F1E39;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:0 16px;
+  margin-bottom:10px;
+  cursor:pointer;
+}
+
+.list-row:hover{
+  background:#183055;
+
+}
+/* ===== VOS Explorer Toolbar ===== */
+
+.toolbar{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+  height:60px;
+  background:#0B1830;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.tool-btn{
+  width:40px;
+  min-width:40px;
+  height:40px;
+  border:none;
+  border-radius:10px;
+  background:#122241;
+  color:#E2E8F0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.tool-btn:hover{
+  background:#183055;
+  color:#00F5D4;
+}
+
+.path-bar{
+  flex:1;
+  height:40px;
+  background:#122241;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 14px;
+  color:#F8FAFC;
+  min-width:220px;
+}
+
+.search-box{
+  width:220px;
+  min-width:220px;
+  height:40px;
+  background:#122241;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 12px;
+}
+
+.search-box input{
+  flex:1;
+  border:none;
+  outline:none;
+  background:transparent;
+  color:#fff;
+  font-size:14px;
+}
+
+/* ===== Grid ===== */
+
+.file-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(170px,170px));
+  gap:18px;
+  padding:18px;
+  justify-content:flex-start;
+}
+
+.file-card{
+  width:170px;
+  height:145px;
+  background:#0F1F3D;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  transition:.25s;
+  cursor:pointer;
+}
+
+.file-card:hover{
+  border-color:#00F5D4;
+  transform:translateY(-3px);
+}
+
+.folder-icon{
+  color:#00F5D4;
+  margin-bottom:12px;
+}
+
+.file-card h4{
+  color:#F8FAFC;
+  margin:0;
+  font-size:15px;
+}
+
+.file-card span{
+  color:#94A3B8;
+  font-size:12px;
+  margin-top:6px;
+}
