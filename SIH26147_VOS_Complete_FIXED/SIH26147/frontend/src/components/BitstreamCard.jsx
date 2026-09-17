@@ -1,0 +1,1 @@
+export default function BitstreamCard({data}){return <section className="card"><h3>Bitstream</h3><div className="metrics"><b>{data.length}<small>bits</small></b><b>{data.entropy?.toFixed(3)}<small>entropy</small></b><b>{data.packets?.length||0}<small>packets</small></b></div><code>{data.preview}</code></section>}

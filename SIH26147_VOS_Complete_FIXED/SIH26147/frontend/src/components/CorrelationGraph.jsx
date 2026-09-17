@@ -1,0 +1,1 @@
+import {LineChart,Line,XAxis,YAxis,ResponsiveContainer} from "recharts"; export default function CorrelationGraph({data}){let d=(data?.lags||[]).map((x,i)=>({x,y:data.values[i]}));return <ResponsiveContainer width="100%" height={220}><LineChart data={d}><XAxis dataKey="x"/><YAxis/><Line dataKey="y" dot={false}/></LineChart></ResponsiveContainer>}

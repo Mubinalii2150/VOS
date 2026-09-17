@@ -1,0 +1,13 @@
+services:
+  backend:
+    build: ./backend
+    ports: ["5000:5000"]
+    environment:
+      CORS_ORIGINS: http://localhost:5173
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/outputs:/app/outputs
+  frontend:
+    build: ./frontend
+    ports: ["5173:80"]
+    depends_on: [backend]
