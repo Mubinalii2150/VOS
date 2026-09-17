@@ -24,8 +24,8 @@ const saveSecurity = () => {
   setTimeout(() => setSaved(false), 2500);
 };
   const wallpapers = [
-    "/wall3.jpg",
     "/wallpaper.jpg",
+    "/wall3.jpg",
     "/wall2.jpg",
   ];
 
