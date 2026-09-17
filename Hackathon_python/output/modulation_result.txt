@@ -1,0 +1,9 @@
+===== MODULATION ANALYSIS =====
+IQ Samples: 132300
+Mean Amplitude: 0.6366
+Amplitude STD: 0.3078
+Mean I: -0.0000
+Mean Q: 0.0000
+I STD: 0.7071
+Q STD: 0.0000
+Candidate Type: Unknown / WAV-derived test signal
