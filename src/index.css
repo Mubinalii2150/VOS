@@ -2414,3 +2414,106 @@ height:70px;
   border-radius:20px;
   background:#24324D;
 }
+/* ===========================
+   VOS SYSTEM & SECURITY
+=========================== */
+
+.toggle-btn{
+  width:72px;
+  height:34px;
+  border:none;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:700;
+  transition:.25s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.toggle-btn.on{
+  background:linear-gradient(135deg,#00F5D4,#00D4C0);
+  color:#08101F;
+  box-shadow:0 0 14px rgba(0,245,212,.35);
+}
+
+.toggle-btn.off{
+  background:#334155;
+  color:#F8FAFC;
+}
+
+.toggle-btn:hover{
+  transform:scale(1.05);
+}
+
+/* Save Button */
+
+.save-config-btn{
+  width:100%;
+  margin-top:22px;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  cursor:pointer;
+  font-size:15px;
+  font-weight:700;
+  color:#08101F;
+  background:linear-gradient(90deg,#00F5D4,#7C3AED);
+  transition:.25s;
+}
+
+.save-config-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(124,58,237,.28);
+}
+
+/* Success Message */
+
+.save-success{
+  margin-top:16px;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  font-size:14px;
+  font-weight:600;
+  color:#22C55E;
+  border:1px solid rgba(34,197,94,.30);
+  background:rgba(34,197,94,.08);
+}
+
+/* Security Cards */
+
+.setting-card{
+  background:#1E293B;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.setting-card b{
+  color:#F8FAFC;
+  font-size:15px;
+}
+
+.setting-card p{
+  color:#94A3B8;
+  font-size:13px;
+  margin-top:4px;
+}
+
+/* Security Title */
+
+.settings-content h2{
+  color:#F8FAFC;
+  margin-bottom:22px;
+}
+
+.settings-content h3{
+  color:#CBD5E1;
+  margin:18px 0 10px;
+}
