@@ -9,7 +9,7 @@ from feature_extraction.service import extract_signal_features
 
 
 features = extract_signal_features(
-    file_path="sample_test.wav",
+    file_path="../samples/radio_signal.wav",
     output_dir="output",
 )
 

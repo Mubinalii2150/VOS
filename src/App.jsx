@@ -39,7 +39,7 @@ export default function App() {
   const [volume, setVolume] = useState(70);
   const [wifi, setWifi] = useState(true);
   const [airplane, setAirplane] = useState(false);
-
+const [analysis, setAnalysis] = useState(null);
   /* ---------------- Context Menu ---------------- */
   const [ctx, setCtx] = useState({
     show: false,
@@ -334,25 +334,25 @@ export default function App() {
       )}
 
       {/* Extractor */}
-      {extractor.open && !extractor.minimized && (
-        <Window
-          title="File Extractor"
-          onClose={() =>
-            setExtractor({
-              open: false,
-              minimized: false,
-            })
-          }
-          onMinimize={() =>
-            setExtractor({
-              open: true,
-              minimized: true,
-            })
-          }
-        >
-          <FileExtractor />
-        </Window>
-      )}
+     {/* File Extractor */}
+<Window
+  title="File Extractor"
+  hidden={!extractor.open || extractor.minimized}
+  onClose={() =>
+    setExtractor({
+      open: false,
+      minimized: false,
+    })
+  }
+  onMinimize={() =>
+    setExtractor({
+      open: true,
+      minimized: true,
+    })
+  }
+>
+  <FileExtractor />
+</Window>
 
       {/* Taskbar */}
       <Taskbar

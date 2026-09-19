@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
+  Upload,
   ShieldCheck,
   Lock,
   User,
   LogOut,
   Archive,
-  FolderOpen,
   FileArchive,
   CheckCircle2,
   Activity,
@@ -19,14 +19,26 @@ import {
   MemoryStick,
 } from "lucide-react";
 
+const API = "http://127.0.0.1:5000";
+import ThreatGauge from "./ThreatGauge";
+
 export default function FileExtractor() {
   const [auth, setAuth] = useState(false);
   const [user, setUser] = useState("analyst");
   const [pass, setPass] = useState("");
   const [role, setRole] = useState("Analyst");
+
   const [time, setTime] = useState("");
-  const [signal, setSignal] = useState(97);
+  const [signal, setSignal] = useState(96);
+
+  const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [error, setError] = useState("");
+
+  const [files, setFiles] = useState([]);
+  const [analysis, setAnalysis] = useState(null);
+
+  const fileRef = useRef(null);
 
   useEffect(() => {
     const clock = setInterval(() => {
@@ -41,7 +53,7 @@ export default function FileExtractor() {
 
     const sig = setInterval(() => {
       setSignal(Math.floor(90 + Math.random() * 10));
-    }, 2000);
+    }, 2500);
 
     return () => {
       clearInterval(clock);
@@ -52,24 +64,88 @@ export default function FileExtractor() {
   const login = () => {
     if (user === "analyst" && pass === "vos1234") {
       setAuth(true);
+      setError("");
     } else {
-      alert("Invalid Analyst ID or Password");
+      setError("Invalid Analyst ID or Password");
     }
   };
 
-  const archives = [
-    { name: "VOS_Assets.zip", size: "124 MB" },
-    { name: "Icons_Pack.zip", size: "38 MB" },
-    { name: "Projects_Backup.zip", size: "512 MB" },
-  ];
+ const uploadFile = async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-  /* ================= AUTH SCREEN ================= */
+  setLoading(true);
+  setDone(false);
+  setError("");
 
-  if (!auth) {
+  try {
+    const form = new FormData();
+    form.append("file", file);
+
+    const res = await fetch(`${API}/analyze`, {
+      method: "POST",
+      body: form,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || data.status !== "success") {
+      throw new Error(data.error || "Analysis Failed");
+    }
+
+    const f = data.features || {};
+    const img = data.images || {};
+
+    setAnalysis({
+      signal_strength: f.signal_strength ?? 0,
+      center_frequency: f.center_frequency ?? "N/A",
+      bandwidth: f.bandwidth ?? "N/A",
+      security_score: f.security_score ?? 0,
+      threat: f.threat ?? "UNKNOWN",
+
+      snr: f.snr ?? 0,
+      noise_floor: f.noise_floor ?? 0,
+      dynamic_range: f.dynamic_range ?? 0,
+      rms_power: f.rms_power ?? 0,
+
+      fft: img.fft ? `${API}${img.fft}?t=${Date.now()}` : "",
+      spectrogram: img.spectrogram
+        ? `${API}${img.spectrogram}?t=${Date.now()}`
+        : "",
+      waterfall: img.waterfall
+        ? `${API}${img.waterfall}?t=${Date.now()}`
+        : "",
+      waveform: img.waveform
+        ? `${API}${img.waveform}?t=${Date.now()}`
+        : "",
+    });
+
+    setFiles((prev) => [
+      {
+        name: file.name,
+        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+        analyzed: true,
+      },
+      ...prev,
+    ]);
+
+    setDone(true);
+  } catch (err) {
+    console.error(err);
+    setError(err.message || "Upload Failed");
+  } finally {
+    setLoading(false);
+
+    if (fileRef.current) {
+      fileRef.current.value = "";
+    }
+  }
+};
+    if (!auth) {
     return (
       <div className="extract-auth">
         <div className="auth-card">
-          <ShieldCheck size={50} color="#00F5D4" />
+          <ShieldCheck size={52} color="#00F5D4" />
 
           <h2>VOS</h2>
           <p>NTRO Secure Access Terminal</p>
@@ -80,7 +156,6 @@ export default function FileExtractor() {
             <input
               value={user}
               onChange={(e) => setUser(e.target.value)}
-              placeholder="analyst"
             />
           </div>
 
@@ -91,7 +166,6 @@ export default function FileExtractor() {
               type="password"
               value={pass}
               onChange={(e) => setPass(e.target.value)}
-              placeholder="••••••••"
             />
           </div>
 
@@ -105,17 +179,19 @@ export default function FileExtractor() {
             <option>Forensic Officer</option>
           </select>
 
+          {error && (
+            <p style={{ color: "#EF4444", fontSize: 13 }}>{error}</p>
+          )}
+
           <button className="auth-btn" onClick={login}>
             AUTHENTICATE
           </button>
 
-          <small>Default : analyst / vos1234</small>
+          <small>Default: analyst / vos1234</small>
         </div>
       </div>
     );
   }
-
-  /* ================= DASHBOARD ================= */
 
   return (
     <div className="extractor">
@@ -124,7 +200,7 @@ export default function FileExtractor() {
           <Archive size={30} color="#00F5D4" />
           <div>
             <h2>File Extractor</h2>
-            <p>Authorized Session • Secure ZIP Extraction</p>
+            <p>RF Intelligence Engine</p>
           </div>
         </div>
 
@@ -133,6 +209,8 @@ export default function FileExtractor() {
           onClick={() => {
             setAuth(false);
             setPass("");
+            setAnalysis(null);
+            setFiles([]);
           }}
         >
           <LogOut size={16} />
@@ -148,7 +226,7 @@ export default function FileExtractor() {
 
         <div className="status-chip offline">
           <WifiOff size={14} />
-          Offline Mode
+          OFFLINE
         </div>
 
         <div className="status-chip">
@@ -160,14 +238,14 @@ export default function FileExtractor() {
       <div className="dashboard-grid">
         <div className="dash-card">
           <Radar size={22} color="#00F5D4" />
-          <span>Signal Analyzer</span>
+          <span>Signal</span>
           <h3>{signal}%</h3>
         </div>
 
         <div className="dash-card">
-          <Database size={22} color="#7C3AED" />
+          <Database size={22} color="#8B5CF6" />
           <span>Evidence</span>
-          <h3>248</h3>
+          <h3>{files.length}</h3>
         </div>
 
         <div className="dash-card">
@@ -198,7 +276,7 @@ export default function FileExtractor() {
           <MemoryStick size={20} />
           <div>
             <p>RAM</p>
-            <b>6.2 / 8 GB</b>
+            <b>6.2 GB</b>
           </div>
         </div>
 
@@ -206,34 +284,194 @@ export default function FileExtractor() {
           <HardDrive size={20} />
           <div>
             <p>Storage</p>
-            <b>246 / 512 GB</b>
+            <b>246 GB</b>
           </div>
         </div>
       </div>
 
       <h3 className="section-title">Mission Dashboard</h3>
+            <input
+        ref={fileRef}
+        type="file"
+        hidden
+        accept=".wav,.iq"
+        onChange={uploadFile}
+      />
 
-      <div className="archive-list">
-        {archives.map((a) => (
-          <div className="archive-card" key={a.name}>
-            <div className="archive-info">
-              <FileArchive size={20} color="#7C3AED" />
+      <button
+        className="upload-btn"
+        disabled={loading}
+        onClick={() => fileRef.current?.click()}
+      >
+        <Upload size={18} />
+        {loading ? "Analyzing RF Signal..." : "Upload RF File"}
+      </button>
+
+      {error && (
+        <div
+          className="extract-success"
+          style={{ background: "#7F1D1D", color: "#fff" }}
+        >
+          {error}
+        </div>
+      )}
+
+      {analysis && (
+        <>
+          {/* ================= RF REPORT ================= */}
+
+          <div className="intel-panel">
+            <h3>RF Intelligence Report</h3>
+
+            <div className="intel-grid">
               <div>
-                <h4>{a.name}</h4>
-                <span>{a.size}</span>
+                <span>Signal Strength</span>
+                <h4>{analysis.signal_strength}%</h4>
+              </div>
+
+              <div>
+                <span>Center Frequency</span>
+                <h4>{analysis.center_frequency}</h4>
+              </div>
+
+              <div>
+                <span>Bandwidth</span>
+                <h4>{analysis.bandwidth}</h4>
+              </div>
+
+              <div>
+                <span>Security Score</span>
+                <h4>{analysis.security_score}/100</h4>
+              </div>
+
+              <div>
+                <span>Threat Level</span>
+                <h4>{analysis.threat}</h4>
               </div>
             </div>
+            <div className="gauge-grid">
+  <div className="gauge-card">
+    <span>SNR</span>
+    <h2>{analysis.snr} dB</h2>
+  </div>
 
-            <button
-              className="extract-btn"
-              onClick={() => setDone(true)}
-            >
-              <FolderOpen size={16} />
-              Extract
-            </button>
-          </div>
-        ))}
+  <div className="gauge-card">
+    <span>Noise Floor</span>
+    <h2>{analysis.noise_floor}</h2>
+  </div>
+
+  <div className="gauge-card">
+    <span>Dynamic Range</span>
+    <h2>{analysis.dynamic_range} dB</h2>
+  </div>
+
+  <div className="gauge-card">
+    <span>RMS Power</span>
+    <h2>{analysis.rms_power}</h2>
+  </div>
+</div>
+</div>
+<div className="dashboard-row">
+
+  <div className="threat-wrap">
+    <div className="threat-title">AI Threat Confidence</div>
+
+    <ThreatGauge score={analysis?.security_score ?? 0} />
+
+    <div className="gauge-score">
+      {analysis?.security_score ?? 0}/100
+    </div>
+
+    <div className={`gauge-label ${(analysis?.threat || "LOW").toLowerCase()}`}>
+      {analysis?.threat}
+    </div>
+  </div>
+
+  <div className="mission-card">
+    <h2>MISSION STATUS</h2>
+
+    <div className="mission-row">
+      <span>RF Status</span>
+      <span className="online">ONLINE</span>
+    </div>
+
+    <div className="mission-row">
+      <span>Signal</span>
+      <span>{analysis?.signal_strength}%</span>
+    </div>
+
+    <div className="mission-row">
+      <span>Threat</span>
+      <span className={analysis?.threat?.toLowerCase()}>
+        {analysis?.threat}
+      </span>
+    </div>
+
+    <div className="mission-row">
+      <span>Security</span>
+      <span>{analysis?.security_score}/100</span>
+    </div>
+  </div>
+
+</div>
+          {/* ================= RF IMAGES ================= */}
+
+         <div className="rf-images">
+  {["fft","spectrogram","waterfall","waveform"].map((key)=>(
+    analysis?.[key] && (
+      <div className="rf-card" key={key}>
+        <img
+          src={analysis[key]}
+          alt={key}
+          loading="lazy"
+          onError={(e)=>{
+            e.currentTarget.src="/placeholder.png";
+          }}
+        />
+        <p>{key.toUpperCase()}</p>
       </div>
+    )
+  ))}
+</div>
+
+        </>
+      )}
+            {/* ================= FILE HISTORY ================= */}
+
+      <h3 className="section-title">Evidence Vault</h3>
+
+      <div className="archive-list">
+        {files.length === 0 ? (
+          <div className="archive-card">
+            <div className="archive-info">
+              <FileArchive size={18} color="#64748B" />
+              <div>
+                <h4>No RF Evidence</h4>
+                <span>Upload .wav or .iq file</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          files.map((file, index) => (
+            <div className="archive-card" key={index}>
+              <div className="archive-info">
+                <FileArchive size={18} color="#8B5CF6" />
+                <div>
+                  <h4>{file.name}</h4>
+                  <span>{file.size}</span>
+                </div>
+              </div>
+
+              <div className="done-chip">
+                <CheckCircle2 size={16} />
+                Analyzed
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ================= TERMINAL ================= */}
 
       <div className="secure-terminal">
         <div className="terminal-title">
@@ -242,21 +480,31 @@ export default function FileExtractor() {
         </div>
 
         <div className="terminal-body">
-          <p>$ integrity check...</p>
-          <p>$ sandbox initialized...</p>
-          <p>$ archive verified...</p>
+          <p>$ vos_rf_engine --boot</p>
+          <p>$ initializing RF Intelligence Engine...</p>
+          <p>$ evidence vault mounted</p>
+          <p>$ signal parser ready</p>
+
+          {loading && (
+            <p style={{ color: "#FACC15" }}>
+              ● Processing RF signal...
+            </p>
+          )}
+
           {done && (
             <p className="success">
-              ✓ Extraction completed successfully.
+              ✓ Analysis completed successfully.
             </p>
           )}
         </div>
       </div>
 
+      {/* ================= SUCCESS ================= */}
+
       {done && (
         <div className="extract-success">
           <CheckCircle2 size={18} />
-          All archives extracted successfully.
+          RF Evidence stored successfully in Local SQLite Vault.
         </div>
       )}
     </div>

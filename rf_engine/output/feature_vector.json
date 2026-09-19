@@ -1,0 +1,17 @@
+{
+  "sample_rate": 16000.0,
+  "rms_power": 0.4984,
+  "peak_amplitude": 1.0,
+  "energy": 19870.75,
+  "noise_floor": 0.022755,
+  "snr_db": 26.81,
+  "dynamic_range_db": 32.86,
+  "dominant_freq": 440.0,
+  "peak_freq": 440.0,
+  "centre_freq": 546.5281472367831,
+  "occupied_bandwidth": 440.2,
+  "total_spectral_power": 298250589.18717456,
+  "risk_level": "MEDIUM",
+  "confidence": 75,
+  "color": "yellow"
+}

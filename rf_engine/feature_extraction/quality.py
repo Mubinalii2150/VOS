@@ -1,47 +1,37 @@
-from __future__ import annotations
-
-import logging
-from typing import Dict
-
 import numpy as np
 
-logger = logging.getLogger(__name__)
+def analyze_signal_quality(signal, sample_rate):
+    if np.iscomplexobj(signal):
+        x = np.abs(signal)
+    else:
+        x = signal.astype(np.float32)
 
+    x = np.nan_to_num(x)
 
-def analyze_signal_quality(sig: np.ndarray, sample_rate: float) -> Dict[str, float]:
-    """Compute basic signal quality metrics.
+    rms = float(np.sqrt(np.mean(x**2)))
+    peak = float(np.max(np.abs(x)))
+    energy = float(np.sum(x**2))
 
-    Returns dict with RMS Power, Peak Amplitude, Energy, Noise Floor, SNR (dB), Dynamic Range, DC Offset
-    """
-    x = sig
-    # Work with magnitude for complex signals
-    mag = np.abs(x)
-    rms = float(np.sqrt(np.mean(mag ** 2)))
-    peak = float(np.max(mag))
-    energy = float(np.sum(mag ** 2))
-    # Compute DC offset separately for real and imaginary parts to avoid ComplexWarning
-    mean_val = np.mean(x)
-    dc_offset_real = float(np.real(mean_val))
-    dc_offset_imag = float(np.imag(mean_val)) if np.iscomplexobj(x) else 0.0
+    # Bottom 10% samples se noise estimate
+    sorted_x = np.sort(np.abs(x))
+    n = max(10, len(sorted_x) // 10)
+    noise_floor = float(np.mean(sorted_x[:n]))
 
-    # Estimate noise floor as median of lower 10% of magnitudes
-    sorted_mag = np.sort(mag)
-    idx = max(1, int(0.1 * len(sorted_mag)))
-    noise_floor = float(np.median(sorted_mag[:idx]))
+    if noise_floor < 1e-6:
+        noise_floor = 1e-6
 
-    # SNR: ratio of signal RMS to noise_floor (in dB). Avoid div by zero.
-    snr = 20.0 * np.log10(rms / (noise_floor + 1e-12))
+    snr = 20 * np.log10((rms + 1e-9) / noise_floor)
+    dynamic_range = 20 * np.log10((peak + 1e-9) / noise_floor)
 
-    # Dynamic range: peak to noise floor (dB)
-    dynamic_range = 20.0 * np.log10((peak + 1e-12) / (noise_floor + 1e-12))
+    # Clamp realistic values
+    snr = np.clip(snr, 0, 60)
+    dynamic_range = np.clip(dynamic_range, 0, 96)
 
     return {
-        "rms_power": rms,
-        "peak_amplitude": peak,
-        "energy": energy,
-        "noise_floor": noise_floor,
-        "snr_db": float(snr),
-        "dynamic_range_db": float(dynamic_range),
-        "dc_offset_real": dc_offset_real,
-        "dc_offset_imag": dc_offset_imag,
+        "rms_power": round(rms, 4),
+        "peak_amplitude": round(peak, 4),
+        "energy": round(energy, 2),
+        "noise_floor": round(noise_floor, 6),
+        "snr_db": round(float(snr), 2),
+        "dynamic_range_db": round(float(dynamic_range), 2),
     }
