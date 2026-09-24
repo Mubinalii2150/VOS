@@ -1,6 +1,7 @@
 import os
 import numpy as np
 
+from utils.fingerprint import generate_fingerprint
 from .reader import read_signal
 from .quality import analyze_signal_quality
 from .fft import analyze_spectrum
@@ -19,6 +20,8 @@ def extract_signal_features(file_path, output_dir="output"):
 
     signal, sample_rate = read_signal(file_path)
     signal = np.nan_to_num(signal)
+
+    fingerprint = generate_fingerprint(signal, sample_rate)
 
     quality = analyze_signal_quality(signal, sample_rate)
     spectrum = analyze_spectrum(signal, sample_rate, output_dir)
@@ -67,4 +70,6 @@ def extract_signal_features(file_path, output_dir="output"):
         "noise_floor": quality["noise_floor"],
         "dynamic_range": quality["dynamic_range_db"],
         "rms_power": quality["rms_power"],
+
+        "fingerprint": fingerprint,
     }

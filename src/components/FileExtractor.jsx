@@ -18,11 +18,14 @@ import {
   HardDrive,
   MemoryStick,
 } from "lucide-react";
-
+import axios from "axios";
 const API = "http://127.0.0.1:5000";
 import ThreatGauge from "./ThreatGauge";
 
-export default function FileExtractor() {
+export default function FileExtractor({
+  analysis,
+  setAnalysis,
+}) {
   const [auth, setAuth] = useState(false);
   const [user, setUser] = useState("analyst");
   const [pass, setPass] = useState("");
@@ -36,7 +39,7 @@ export default function FileExtractor() {
   const [error, setError] = useState("");
 
   const [files, setFiles] = useState([]);
-  const [analysis, setAnalysis] = useState(null);
+
 
   const fileRef = useRef(null);
 
@@ -69,8 +72,7 @@ export default function FileExtractor() {
       setError("Invalid Analyst ID or Password");
     }
   };
-
- const uploadFile = async (e) => {
+const uploadFile = async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
 
@@ -79,66 +81,49 @@ export default function FileExtractor() {
   setError("");
 
   try {
-    const form = new FormData();
-    form.append("file", file);
+    const formData = new FormData();
+    formData.append("file", file);
 
     const res = await fetch(`${API}/analyze`, {
       method: "POST",
-      body: form,
+      body: formData,
     });
 
     const data = await res.json();
 
-    if (!res.ok || data.status !== "success") {
-      throw new Error(data.error || "Analysis Failed");
+    if (data.status !== "success") {
+      throw new Error(data.error);
     }
 
-    const f = data.features || {};
-    const img = data.images || {};
+    const f = data.features;
+    const img = data.images;
 
     setAnalysis({
-      signal_strength: f.signal_strength ?? 0,
-      center_frequency: f.center_frequency ?? "N/A",
-      bandwidth: f.bandwidth ?? "N/A",
-      security_score: f.security_score ?? 0,
-      threat: f.threat ?? "UNKNOWN",
-
-      snr: f.snr ?? 0,
-      noise_floor: f.noise_floor ?? 0,
-      dynamic_range: f.dynamic_range ?? 0,
-      rms_power: f.rms_power ?? 0,
-
-      fft: img.fft ? `${API}${img.fft}?t=${Date.now()}` : "",
-      spectrogram: img.spectrogram
-        ? `${API}${img.spectrogram}?t=${Date.now()}`
-        : "",
-      waterfall: img.waterfall
-        ? `${API}${img.waterfall}?t=${Date.now()}`
-        : "",
-      waveform: img.waveform
-        ? `${API}${img.waveform}?t=${Date.now()}`
-        : "",
+      ...f,
+      audio: data.audio,
+      fft: `${API}${img.fft}`,
+      spectrogram: `${API}${img.spectrogram}`,
+      waterfall: `${API}${img.waterfall}`,
+      waveform: `${API}${img.waveform}`,
+      vault: data.vault,
     });
 
     setFiles((prev) => [
       {
         name: file.name,
-        size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-        analyzed: true,
+        uploadedAt: new Date().toLocaleTimeString(),
+        threat: f.threat,
+        score: f.security_score,
       },
       ...prev,
     ]);
 
     setDone(true);
   } catch (err) {
-    console.error(err);
-    setError(err.message || "Upload Failed");
+    setError(err.message);
   } finally {
     setLoading(false);
-
-    if (fileRef.current) {
-      fileRef.current.value = "";
-    }
+    if (fileRef.current) fileRef.current.value = "";
   }
 };
     if (!auth) {
@@ -317,9 +302,71 @@ export default function FileExtractor() {
       )}
 
       {analysis && (
+        
         <>
           {/* ================= RF REPORT ================= */}
+ {analysis?.fingerprint && (
+  <div className="fingerprint-card">
+    <div className="fp-header">
+      <div>
+        <p className="fp-sub">FORENSIC IDENTITY</p>
+        <h3>RF Fingerprint</h3>
+      </div>
 
+      <div className="fp-badge">VERIFIED</div>
+    </div>
+
+    <div className="fp-code">
+      {analysis.fingerprint}
+    </div>
+
+    <div className="fp-footer">
+      <span>256-bit Digital Signature</span>
+
+      <button
+        className="copy-btn"
+        onClick={() =>
+          navigator.clipboard.writeText(
+            analysis.fingerprint
+          )
+        }
+      >
+        Copy
+      </button>
+    </div>
+    
+  </div>
+  
+)}
+{/* Chain of Custody */}
+<div className="custody-card">
+  <div className="custody-header">
+    <h3>Chain of Custody</h3>
+    <span className="secure-badge">SECURE</span>
+  </div>
+
+  <div className="custody-grid">
+    <div className="custody-item">
+      <label>Evidence ID</label>
+      <p>{analysis?.fingerprint}</p>
+    </div>
+
+    <div className="custody-item">
+      <label>File</label>
+      <p>{analysis?.filename }</p>
+    </div>
+
+   <div className="custody-item">
+  <label>Captured</label>
+  <p>{analysis?.captured_at}</p>
+  </div>
+
+    <div className="custody-item">
+      <label>Analyst</label>
+      <p>VOS AI Engine</p>
+    </div>
+  </div>
+</div>
           <div className="intel-panel">
             <h3>RF Intelligence Report</h3>
 
@@ -411,12 +458,52 @@ export default function FileExtractor() {
       <span>Security</span>
       <span>{analysis?.security_score}/100</span>
     </div>
+ 
   </div>
 
 </div>
-          {/* ================= RF IMAGES ================= */}
+{/* ================= MISSION HISTORY ================= */}
+<div className="history-card">
+  <div className="history-header">
+    <h3>MISSION HISTORY</h3>
+    <span>Last Analysis</span>
+  </div>
 
-         <div className="rf-images">
+  <table className="history-table">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>File</th>
+        <th>Threat</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {files.length === 0 ? (
+        <tr>
+          <td colSpan="4">No Analysis</td>
+        </tr>
+      ) : (
+        files.map((f, i) => (
+          <tr key={i}>
+            <td>{f.uploadedAt}</td>
+            <td>{f.name}</td>
+            <td className={f.threat.toLowerCase()}>
+              {f.threat}
+            </td>
+            <td>{f.score}/100</td>
+          </tr>
+        ))
+      )}
+    </tbody>
+  </table>
+
+</div>
+
+ {/* ================= RF IMAGES ================= */}
+
+ <div className="rf-images">
   {["fft","spectrogram","waterfall","waveform"].map((key)=>(
     analysis?.[key] && (
       <div className="rf-card" key={key}>
@@ -433,9 +520,20 @@ export default function FileExtractor() {
     )
   ))}
 </div>
-
-        </>
+</>
       )}
+
+{analysis?.audio && (
+  <div className="audio-card">
+    <h3>Recovered RF Audio</h3>
+<audio controls className="audio-player">
+  <source
+    src={`http://127.0.0.1:5000${analysis?.audio || ""}`}
+    type="audio/wav"
+  />
+</audio>
+  </div>
+)}
             {/* ================= FILE HISTORY ================= */}
 
       <h3 className="section-title">Evidence Vault</h3>
@@ -470,6 +568,7 @@ export default function FileExtractor() {
           ))
         )}
       </div>
+      
 
       {/* ================= TERMINAL ================= */}
 

@@ -335,24 +335,31 @@ const [analysis, setAnalysis] = useState(null);
 
       {/* Extractor */}
      {/* File Extractor */}
-<Window
-  title="File Extractor"
-  hidden={!extractor.open || extractor.minimized}
-  onClose={() =>
-    setExtractor({
-      open: false,
-      minimized: false,
-    })
-  }
-  onMinimize={() =>
-    setExtractor({
-      open: true,
-      minimized: true,
-    })
-  }
->
-  <FileExtractor />
-</Window>
+
+{extractor.open && !extractor.minimized && (
+  <Window
+    title="File Extractor"
+    onClose={() =>
+      setExtractor({
+        open: false,
+        minimized: false,
+      })
+    }
+    onMinimize={() =>
+      setExtractor({
+        open: true,
+        minimized: true,
+      })
+    }
+  >
+    <FileExtractor
+      analysis={analysis}
+      setAnalysis={setAnalysis}
+    />
+  </Window>
+)}
+
+
 
       {/* Taskbar */}
       <Taskbar

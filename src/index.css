@@ -3864,3 +3864,279 @@ height:70px;
     grid-template-columns:1fr;
   }
 }
+/* =========================
+   MISSION HISTORY
+========================= */
+
+.history-card{
+  margin-top:22px;
+  background:linear-gradient(180deg,#04172f,#021126);
+  border:1px solid rgba(0,255,255,.18);
+  border-radius:18px;
+  padding:20px;
+}
+
+.history-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+}
+
+.history-header h3{
+  color:#fff;
+  font-size:18px;
+  margin:0;
+}
+
+.history-header span{
+  color:#7dd3fc;
+  font-size:13px;
+}
+
+.history-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.history-table th{
+  text-align:left;
+  color:#8fb6d8;
+  font-size:14px;
+  padding:12px 8px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.history-table td{
+  color:#fff;
+  padding:14px 8px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+
+.history-table tr:last-child td{
+  border-bottom:none;
+}
+
+.low{
+  color:#00f5a0;
+  font-weight:700;
+}
+
+.medium{
+  color:#ffc107;
+  font-weight:700;
+}
+
+.critical{
+  color:#ff4d73;
+  font-weight:700;
+}
+.fingerprint-card{
+  border:1px solid #00f5d4;
+  background:linear-gradient(135deg,#071d36,#0a2b4d);
+  box-shadow:0 0 18px rgba(0,245,212,.15);
+}
+
+.fingerprint-card h3{
+  margin-top:8px;
+  color:#00f5d4;
+  font-size:20px;
+  letter-spacing:2px;
+  font-family:"Consolas", monospace;
+}
+
+.fingerprint-card small{
+  color:#8dd8ff;
+  font-size:11px;
+}
+/* ================= RF FINGERPRINT ================= */
+
+.fingerprint-card{
+  margin:18px 0;
+  padding:22px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#07192f 0%,#0b2747 100%);
+  border:1px solid rgba(0,245,212,.35);
+  box-shadow:0 0 25px rgba(0,245,212,.08);
+}
+
+.fp-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:18px;
+}
+
+.fp-sub{
+  font-size:11px;
+  color:#7dd3fc;
+  letter-spacing:2px;
+  margin:0 0 6px;
+}
+
+.fp-header h3{
+  margin:0;
+  color:#fff;
+  font-size:22px;
+  font-weight:700;
+}
+
+.fp-badge{
+  background:rgba(34,197,94,.15);
+  color:#22c55e;
+  border:1px solid rgba(34,197,94,.4);
+  padding:6px 12px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+.fp-code{
+  font-family:"JetBrains Mono",monospace;
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:3px;
+  color:#00f5d4;
+  padding:16px 18px;
+  border-radius:12px;
+  background:rgba(0,0,0,.28);
+  border:1px dashed rgba(0,245,212,.35);
+  word-break:break-all;
+}
+
+.fp-footer{
+  margin-top:16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.fp-footer span{
+  color:#94a3b8;
+  font-size:13px;
+}
+
+.copy-btn{
+  padding:8px 16px;
+  border:none;
+  border-radius:10px;
+  background:#00f5d4;
+  color:#04111f;
+  font-weight:700;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.copy-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 0 18px rgba(0,245,212,.45);
+}
+
+@media (max-width:768px){
+  .fp-header,
+  .fp-footer{
+    flex-direction:column;
+    gap:12px;
+    align-items:flex-start;
+  }
+
+  .fp-code{
+    font-size:18px;
+    letter-spacing:1px;
+  }
+}
+.custody-card{
+  margin:18px 0;
+  background:#07192d;
+  border:1px solid #00d9ff55;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 0 25px rgba(0,217,255,.08);
+}
+
+.custody-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.custody-header h3{
+  color:#fff;
+  font-size:20px;
+  margin:0;
+}
+
+.secure-badge{
+  background:#00ff9d22;
+  color:#00ff9d;
+  border:1px solid #00ff9d55;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+}
+
+.custody-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+}
+
+.custody-grid div{
+  background:#031223;
+  border:1px solid #143a58;
+  border-radius:12px;
+  padding:14px;
+}
+
+.custody-grid p{
+  color:#6db8ff;
+  font-size:12px;
+  margin-bottom:6px;
+}
+
+.custody-grid h4{
+  color:#fff;
+  font-family:monospace;
+  font-size:15px;
+  word-break:break-all;
+}
+
+@media(max-width:768px){
+  .custody-grid{
+    grid-template-columns:1fr;
+  }
+}
+.custody-item p{
+  color:#fff;
+  font-weight:600;
+  margin-top:6px;
+  word-break:break-all;
+}
+.custody-item p{
+  color:#fff;
+  font-weight:600;
+  margin-top:6px;
+  word-break:break-all;
+}
+
+.audio-card{
+  margin-top:20px;
+  padding:18px;
+  border-radius:16px;
+  background:#07192f;
+  border:1px solid rgba(0,245,212,.25);
+}
+
+.audio-card h3{
+  color:#00f5d4;
+  margin-bottom:14px;
+}
+
+.audio-info{
+  margin-top:10px;
+  color:#94a3b8;
+  font-size:13px;
+}
