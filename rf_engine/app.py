@@ -3,9 +3,18 @@ from flask_cors import CORS
 import os
 import math
 
+# RF Engine
 from feature_extraction.service import extract_signal_features
 from utils.audio_converter import iq_to_wav, wav_to_audio
+
+# Database
+from database.matcher import match_fingerprint
 from database.db import init_db, save_report, get_reports
+
+# AI Modules
+from ai_intelligence.speech_to_text import transcribe_audio
+from ai_intelligence.threat_detector import detect_threat
+from ai_intelligence.modulation_classifier import classify_modulation
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +24,7 @@ CORS(app)
 # =====================================================
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
 OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
@@ -35,11 +45,12 @@ init_db()
 def home():
     return jsonify({
         "server": "VOS RF Engine",
+        "version": "2.0",
         "status": "ONLINE"
     })
 
 # =====================================================
-# ANALYZE RF FILE
+# ANALYZE RF SIGNAL
 # =====================================================
 
 @app.route("/analyze", methods=["POST"])
@@ -51,15 +62,15 @@ def analyze():
             "error": "No file uploaded"
         }), 400
 
-    uploaded_file = request.files["file"]
+    file = request.files["file"]
 
-    if uploaded_file.filename == "":
+    if file.filename == "":
         return jsonify({
             "status": "failed",
             "error": "Empty filename"
         }), 400
 
-    filename = uploaded_file.filename
+    filename = file.filename
     ext = os.path.splitext(filename)[1].lower()
 
     if ext not in [".wav", ".iq"]:
@@ -69,25 +80,43 @@ def analyze():
         }), 400
 
     save_path = os.path.join(UPLOAD_DIR, filename)
-    uploaded_file.save(save_path)
+    file.save(save_path)
+    
 
     try:
 
-        # ---------------- RF Feature Extraction ----------------
+        # =================================================
+        # 1. RF FEATURE EXTRACTION
+        # =================================================
 
         features = extract_signal_features(
             file_path=save_path,
             output_dir=OUTPUT_DIR
         )
 
-        # ---------------- Audio Recovery ----------------
+        device = match_fingerprint(features["fingerprint"])
+        # =================================================
+        # 2. AUDIO RECOVERY
+        # =================================================
 
         if ext == ".iq":
-            iq_to_wav(save_path, OUTPUT_DIR)
+            audio_file = iq_to_wav(save_path, OUTPUT_DIR)
         else:
-            wav_to_audio(save_path, OUTPUT_DIR)
+            audio_file = wav_to_audio(save_path, OUTPUT_DIR)
 
-        # ---------------- JSON Safe ----------------
+        # =================================================
+        # 3. AI SPEECH INTELLIGENCE
+        # =================================================
+        
+
+        transcript = transcribe_audio(audio_file, OUTPUT_DIR)
+
+        threat = detect_threat(transcript["text"])
+
+        modulation = classify_modulation(features)
+        # =================================================
+        # JSON SAFE
+        # =================================================
 
         for key, value in list(features.items()):
             if isinstance(value, float) and not math.isfinite(value):
@@ -95,21 +124,26 @@ def analyze():
 
         features["filename"] = filename
 
-        # ---------------- SQLite Save ----------------
+        # =================================================
+        # SAVE DATABASE
+        # =================================================
 
         save_report(
             filename=filename,
             signal=features["signal_strength"],
-            threat=features["threat"],
+            threat=threat["level"],
             score=features["security_score"],
-            fingerprint=features["fingerprint"],
+            fingerprint=features["fingerprint"]
         )
 
-        # ---------------- Response ----------------
+        # =================================================
+        # RESPONSE
+        # =================================================
 
         return jsonify({
-            "status": "success",
 
+            "status": "success",
+            "device_match": device,
             "features": features,
 
             "audio": "/output/decoded_audio.wav",
@@ -121,23 +155,41 @@ def analyze():
                 "waveform": "/output/waveform.png"
             },
 
+            "ai": {
+               "transcript": transcript["text"],
+               "language": transcript["language"],
+               "confidence": transcript["confidence"],
+               "threat_level": threat["level"],
+               "keywords": threat["keywords"]
+            },
+
+            "modulation": {
+              "type": modulation["type"],
+              "confidence": modulation["confidence"],
+              "symbol_rate": modulation["symbol_rate"],
+              "quality": modulation["quality"]
+            },
+
             "vault": {
                 "file": filename,
-                "location": "Local SQLite Vault"
+                "location": "Local SQLite Evidence Vault",
+                "saved": True
             }
+
         })
 
-    except Exception as exc:
+    except Exception as e:
 
-        print("RF ENGINE ERROR:", exc, flush=True)
+        print("RF ENGINE ERROR:", e, flush=True)
 
         return jsonify({
             "status": "failed",
-            "error": str(exc)
+            "error": str(e)
         }), 500
 
+
 # =====================================================
-# REPORT HISTORY
+# HISTORY
 # =====================================================
 
 @app.route("/history")
@@ -145,10 +197,10 @@ def history():
 
     rows = get_reports()
 
-    result = []
+    data = []
 
     for r in rows:
-        result.append({
+        data.append({
             "file": r[0],
             "signal": r[1],
             "score": r[2],
@@ -156,7 +208,8 @@ def history():
             "time": r[4]
         })
 
-    return jsonify(result)
+    return jsonify(data)
+
 
 # =====================================================
 # OUTPUT FILES
@@ -165,6 +218,7 @@ def history():
 @app.route("/output/<path:filename>")
 def output_file(filename):
     return send_from_directory(OUTPUT_DIR, filename)
+
 
 # =====================================================
 # RUN

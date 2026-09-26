@@ -4140,3 +4140,63 @@ height:70px;
   color:#94a3b8;
   font-size:13px;
 }
+
+.intel-card{
+  margin:22px 0;
+  background:#061a33;
+  border:1px solid #00e5ff55;
+  border-radius:16px;
+  padding:18px;
+}
+
+.intel-card h3{
+  color:#00f5ff;
+  margin-bottom:18px;
+}
+
+.intel-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.intel-grid div{
+  background:#081427;
+  border-radius:12px;
+  padding:14px;
+}
+
+.intel-grid label{
+  color:#7aa7c7;
+  font-size:12px;
+}
+
+.intel-grid h2{
+  color:white;
+  margin-top:6px;
+  font-size:22px;
+}
+
+.transcript-box{
+  background:#020d1c;
+  border:1px dashed #00e5ff66;
+  border-radius:12px;
+  padding:14px;
+}
+
+.transcript-box label{
+  color:#7aa7c7;
+  font-size:12px;
+}
+
+.transcript-box p{
+  color:#fff;
+  margin-top:8px;
+  line-height:1.6;
+}
+
+.threat.low{color:#36ff89;}
+.threat.medium{color:#ffd54a;}
+.threat.high{color:#ff9a3d;}
+.threat.critical{color:#ff4d6d;}

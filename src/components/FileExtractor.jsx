@@ -106,6 +106,9 @@ const uploadFile = async (e) => {
       waterfall: `${API}${img.waterfall}`,
       waveform: `${API}${img.waveform}`,
       vault: data.vault,
+      ai: data.ai,
+      modulation: data.modulation,
+      device: data.device_match,  
     });
 
     setFiles((prev) => [
@@ -532,8 +535,71 @@ const uploadFile = async (e) => {
     type="audio/wav"
   />
 </audio>
+
+  </div>
+  
+)}
+
+{/* AI SIGNAL INTELLIGENCE */}
+{analysis?.ai && (
+  <div className="intel-card">
+    <h3>AI Signal Intelligence</h3>
+
+    <div className="intel-grid">
+      <div>
+        <label>Language</label>
+        <h2>{analysis.ai.language}</h2>
+      </div>
+
+      <div>
+        <label>Confidence</label>
+        <h2>{analysis.ai.confidence}%</h2>
+      </div>
+
+      <div>
+        <label>Threat</label>
+        <h2 className={`threat ${analysis.ai.threat_level.toLowerCase()}`}>
+          {analysis.ai.threat_level}
+        </h2>
+      </div>
+    </div>
+
+    <div className="transcript-box">
+      <label>Recovered Transcript</label>
+      <p>{analysis.ai.transcript}</p>
+    </div>
   </div>
 )}
+
+{/* RF DEVICE MATCHING */}
+{analysis?.device && (
+  <div className="intel-card">
+    <h3>RF Device Matching</h3>
+
+    <div className="intel-grid">
+      <div>
+        <label>Status</label>
+        <h2>{analysis.device.status}</h2>
+      </div>
+
+      <div>
+        <label>Similarity</label>
+        <h2>{analysis.device.similarity}%</h2>
+      </div>
+
+      <div>
+        <label>Previously Seen</label>
+        <h2>{analysis.device.seen}</h2>
+      </div>
+    </div>
+
+    <div className="transcript-box">
+      <label>Matched Device</label>
+      <p>{analysis.device.device}</p>
+    </div>
+  </div>
+)}
+
             {/* ================= FILE HISTORY ================= */}
 
       <h3 className="section-title">Evidence Vault</h3>
