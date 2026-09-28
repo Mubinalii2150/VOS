@@ -4880,3 +4880,36 @@ height:70px;
   right:0;
   z-index:20000;
 }
+
+/* Notification panel */
+.notification-popup{
+  width:300px;
+  right:0;
+}
+
+.notify-card{
+  background:#0E2748;
+  border:1px solid rgba(0,255,220,.08);
+  border-radius:10px;
+  padding:10px;
+  margin-top:10px;
+}
+
+.notify-title{
+  display:block;
+  color:#7DF9E6;
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:4px;
+}
+
+.notify-card p{
+  margin:0;
+  color:#E6F4FF;
+  font-size:12px;
+}
+
+.notify-card small{
+  color:#7A9CB8;
+  font-size:11px;
+}
