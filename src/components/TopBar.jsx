@@ -34,29 +34,26 @@ export default function TopBar({
   }, []);
 
   return (
-    <div className="topbar" onClick={(e) => e.stopPropagation()}>
+    <div className="topbar" onClick={() => setPopup("")}>
       {/* LEFT */}
       <div className="top-left">
         <img src="/phoenix.svg" alt="VOS" className="top-logo" />
         <h2>VOS</h2>
-        
       </div>
 
       {/* RIGHT */}
       <div className="top-right">
+
         {/* Volume */}
         <div className="top-item">
           <button
             className="icon-btn"
-            onClick={() =>
-              setPopup(popup === "vol" ? "" : "vol")
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              setPopup(popup === "vol" ? "" : "vol");
+            }}
           >
-            {volume === 0 ? (
-              <VolumeX size={18} />
-            ) : (
-              <Volume2 size={18} />
-            )}
+            {volume === 0 ? <VolumeX size={18} /> : <Volume2 size={18} />}
           </button>
 
           {popup === "vol" && (
@@ -71,9 +68,7 @@ export default function TopBar({
                 min="0"
                 max="100"
                 value={volume}
-                onChange={(e) =>
-                  setVolume(Number(e.target.value))
-                }
+                onChange={(e) => setVolume(Number(e.target.value))}
               />
 
               <p>{volume}%</p>
@@ -81,13 +76,14 @@ export default function TopBar({
           )}
         </div>
 
-        {/* Network */}
+        {/* WiFi */}
         <div className="top-item">
           <button
             className="icon-btn"
-            onClick={() =>
-              setPopup(popup === "wifi" ? "" : "wifi")
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              setPopup(popup === "wifi" ? "" : "wifi");
+            }}
           >
             {airplane ? (
               <Plane size={18} />
@@ -109,11 +105,8 @@ export default function TopBar({
                 <span>Wi-Fi</span>
 
                 <button
-                  className={`mini-toggle ${
-                    wifi ? "on" : "off"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  className={`mini-toggle ${wifi ? "on" : "off"}`}
+                  onClick={() => {
                     setWifi(!wifi);
                     if (airplane) setAirplane(false);
                   }}
@@ -126,11 +119,8 @@ export default function TopBar({
                 <span>Airplane</span>
 
                 <button
-                  className={`mini-toggle ${
-                    airplane ? "on" : "off"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  className={`mini-toggle ${airplane ? "on" : "off"}`}
+                  onClick={() => {
                     const next = !airplane;
                     setAirplane(next);
                     if (next) setWifi(false);
@@ -143,8 +133,6 @@ export default function TopBar({
           )}
         </div>
 
-        {/* Clock */}
-        
       </div>
     </div>
   );

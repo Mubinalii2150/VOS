@@ -8,12 +8,12 @@ export default function Window({
   onMinimize,
   hidden = false,
 }) {
-  const [maximized, setMaximized] = useState(false);
+  const [maximized, setMaximized] = useState(true);
   const [dragging, setDragging] = useState(false);
 
   const [position, setPosition] = useState({
-    x: 180,
-    y: 70,
+    x: 140,
+    y: 90,
   });
 
   const [offset, setOffset] = useState({
@@ -52,9 +52,8 @@ export default function Window({
     };
   }, [dragging, offset, maximized, hidden]);
 
-  
-
- return (
+  if (hidden) return null;
+return (
   <div
     className={`window ${maximized ? "maximized" : ""}`}
     style={{
@@ -69,32 +68,14 @@ export default function Window({
   >
     <div className="window-header" onMouseDown={handleDown}>
       <div className="window-title">
-        <img
-          src="/phoenix.svg"
-          className="window-logo"
-          alt="phoenix"
-        />
+        <img src="/phoenix.svg" className="window-logo" alt="phoenix" />
         <span>{title}</span>
       </div>
 
-      <div
-        className="window-actions"
-        onMouseDown={(e) => e.stopPropagation()}
-      >
-        <button className="win-btn" onClick={onMinimize}>
-          <Minus size={16} />
-        </button>
-
-        <button
-          className="win-btn"
-          onClick={() => setMaximized((m) => !m)}
-        >
-          <Square size={14} />
-        </button>
-
-        <button className="win-btn close" onClick={onClose}>
-          <X size={16} />
-        </button>
+      <div className="window-actions" onMouseDown={(e)=>e.stopPropagation()}>
+        <button className="win-btn" onClick={onMinimize}><Minus size={16}/></button>
+        <button className="win-btn" onClick={()=>setMaximized(!maximized)}><Square size={14}/></button>
+        <button className="win-btn close" onClick={onClose}><X size={16}/></button>
       </div>
     </div>
 
