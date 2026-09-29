@@ -5004,35 +5004,79 @@ height:70px;
    VOS SNAP LAYOUT + RUNNING APP ICONS
    Add this AFTER your existing window/taskbar CSS.
    ========================================================= */
-
 .window {
-  box-sizing: border-box;
-  min-width: 420px;
-  min-height: 260px;
+  position: absolute;
+  background: #04152d;
+  border: 1px solid rgba(0, 255, 220, 0.12);
+  border-radius: 0;
   overflow: hidden;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
 }
 
 .window-header {
   position: relative;
-  z-index: 100;
+  z-index: 1000;
+
+  width: 100%;
+  height: 40px;
+  min-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 4px 0 12px;
+
+  box-sizing: border-box;
   user-select: none;
+  flex-shrink: 0;
+}
+
+.window-title {
+  display: flex;
+  align-items: center;
+
+  height: 100%;
+
+  color: #e5f7ff;
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
 }
 
 .window-actions {
+  height: 100%;
+
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+
   gap: 2px;
+  margin-left: auto;
+
+  flex-shrink: 0;
 }
 
 .window-actions .win-btn {
   width: 38px;
   height: 30px;
+
   padding: 0;
+  margin: 0;
+
   border: 0;
+  outline: none;
+
   display: grid;
   place-items: center;
+
   background: transparent;
   color: #dbeafe;
+
   cursor: pointer;
 }
 
@@ -5045,10 +5089,26 @@ height:70px;
   color: #fff;
 }
 
-.maximize-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
+.window-body {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  box-sizing: border-box;
+}
+
+.window.maximized {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 0;
+}
+/* ================= SNAPPED ================= */
+
+.window-snapped {
+  border-radius: 0;
 }
 
 /* ================= SNAP POPUP ================= */
@@ -5057,13 +5117,16 @@ height:70px;
   position: absolute;
   top: 33px;
   right: 0;
+
   width: 245px;
   padding: 10px;
+
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
 
   background: rgba(25, 29, 38, .98);
+
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 8px;
 
@@ -5074,273 +5137,251 @@ height:70px;
   z-index: 999999;
 }
 
-.snap-option {
-  width: 100%;
-  height: 58px;
-  padding: 4px;
-  border-radius: 5px;
-}
 
-.snap-mini {
-  width: 100%;
-  height: 100%;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 3px;
-}
-
-.snap-slot {
-  min-width: 0;
-  min-height: 0;
-  padding: 0;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid rgba(255,255,255,.42);
-  border-radius: 2px;
-
-  background: rgba(255,255,255,.10);
-  color: rgba(255,255,255,.72);
-
-  cursor: pointer;
-  transition:
-    background .12s ease,
-    border-color .12s ease,
-    transform .12s ease;
-}
-
-.snap-slot.empty {
-  background: rgba(255,255,255,.05);
-}
-
-.snap-slot.occupied {
-  background: rgba(255,255,255,.16);
-}
-
-.snap-slot:hover {
-  background: rgba(0,255,220,.20);
-  border-color: #00ffe0;
-  color: #00ffe0;
-  transform: scale(.96);
-}
-
-.snap-slot.current {
-  background: rgba(0,255,220,.28);
-  border-color: #00ffe0;
-  color: #00ffe0;
-}
-
-/* ================= RESIZE ================= */
-
-.resize-handle {
-  position: absolute;
-  z-index: 1000;
-}
-
-.resize-n,
-.resize-s {
-  left: 8px;
-  right: 8px;
-  height: 7px;
-}
-
-.resize-n {
-  top: -3px;
-  cursor: n-resize;
-}
-
-.resize-s {
-  bottom: -3px;
-  cursor: s-resize;
-}
-
-.resize-e,
-.resize-w {
-  top: 8px;
-  bottom: 8px;
-  width: 7px;
-}
-
-.resize-e {
-  right: -3px;
-  cursor: e-resize;
-}
-
-.resize-w {
-  left: -3px;
-  cursor: w-resize;
-}
-
-.resize-ne,
-.resize-nw,
-.resize-se,
-.resize-sw {
-  width: 12px;
-  height: 12px;
-}
-
-.resize-ne {
-  top: -4px;
-  right: -4px;
-  cursor: ne-resize;
-}
-
-.resize-nw {
-  top: -4px;
-  left: -4px;
-  cursor: nw-resize;
-}
-
-.resize-se {
-  right: -4px;
-  bottom: -4px;
-  cursor: se-resize;
-}
-
-.resize-sw {
-  left: -4px;
-  bottom: -4px;
-  cursor: sw-resize;
-}
-
-.window.maximized {
-  min-width: 0;
-  min-height: 0;
-}
-
-/* Snapped windows sit exactly against each other. */
-.window-snapped {
-  border-radius: 0;
-}
-
-/* VOS Snap Layout V2 */
-
+/* =========================================
+   VOS SNAP LAYOUT V2
+========================================= */
 .vos-snap-v2 {
   position: fixed;
-  right: 18px;
-  top: 78px;
-  width: 360px;
-  padding: 12px;
-  z-index: 20000;
 
-  background: rgba(15, 23, 38, 0.98);
-  border: 1px solid rgba(0, 255, 220, 0.20);
-  border-radius: 10px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.55);
-  color: #e5f7ff;
+  width: 300px;
+
+  padding: 10px;
+
+  background: rgba(9, 22, 45, 0.98);
+
+  border: 1px solid rgba(0, 255, 220, 0.25);
+
+  border-radius: 8px;
+
+  box-shadow:
+    0 12px 35px rgba(0, 0, 0, 0.55),
+    0 0 20px rgba(0, 255, 220, 0.08);
+
+  z-index: 9999999;
+
+  box-sizing: border-box;
+
+  color: #e8faff;
 }
 
+/* HEADER */
 .snap-v2-header {
   display: flex;
+
   align-items: center;
+
   justify-content: space-between;
-  margin-bottom: 10px;
-  font-size: 13px;
+
+  margin-bottom: 8px;
+
+  font-size: 12px;
+
   font-weight: 600;
 }
 
 .snap-v2-close {
+  width: 30px;
+  height: 30px;
+
   border: 0;
+  border-radius: 6px;
+
   background: transparent;
-  color: #9fb0c5;
-  font-size: 20px;
+  color: #dbeafe;
+
+  font-size: 22px;
+
   cursor: pointer;
+
+  display: grid;
+  place-items: center;
 }
 
+
+.snap-v2-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+/* LAYOUT PICKER */
 .snap-v2-layout-picker {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-  margin-bottom: 10px;
+
+  grid-template-columns: repeat(6, 1fr);
+
+  gap: 5px;
+
+  margin-bottom: 8px;
 }
 
 .snap-v2-layout {
-  height: 48px;
-  padding: 5px;
+  height: 38px;
+
+  padding: 4px;
+
   border: 1px solid rgba(255,255,255,.12);
+
   border-radius: 5px;
-  background: rgba(255,255,255,.035);
+
+  background: rgba(255,255,255,.04);
+
   cursor: pointer;
 }
 
-.snap-v2-layout:hover,
-.snap-v2-layout.active {
-  border-color: rgba(0,255,220,.65);
-  background: rgba(0,255,220,.08);
+
+.snap-v2-layout:hover {
+  background: rgba(0, 255, 220, 0.08);
+  border-color: rgba(0, 255, 220, 0.35);
+
+  transform: translateY(-1px);
 }
+
+
+.snap-v2-layout.active {
+  background: rgba(0, 255, 220, 0.12);
+
+  border-color: rgba(0, 255, 220, 0.65);
+}
+
+
+/* SMALL PREVIEW */
 
 .snap-v2-preview {
   width: 100%;
   height: 100%;
+
   display: grid;
-  gap: 2px;
+
+  gap: 3px;
 }
+
 
 .snap-v2-preview span {
-  border: 1px solid rgba(255,255,255,.38);
-  background: rgba(255,255,255,.13);
-  border-radius: 1px;
+  display: block;
+
+  min-width: 0;
+  min-height: 0;
+
+  background: rgba(0, 255, 220, 0.22);
+
+  border: 1px solid rgba(0, 255, 220, 0.35);
+
+  border-radius: 2px;
 }
 
+
+/* WORKSPACE */
 .snap-v2-workspace {
   width: 100%;
-  height: 190px;
+  height: 115px;
+
   display: grid;
+
   gap: 5px;
+
+  padding: 5px;
+
+  box-sizing: border-box;
+
+  background: rgba(0,0,0,.16);
+
+  border-radius: 6px;
+
+  border: 1px solid rgba(255,255,255,.08);
 }
 
 .snap-v2-slot {
   position: relative;
-  min-width: 0;
-  min-height: 0;
 
-  display: grid;
-  place-items: center;
+  display: flex;
 
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 6px;
-  background: rgba(255,255,255,.045);
-  color: #dbeafe;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 8px;
+
+  background: rgba(255, 255, 255, 0.035);
+
   cursor: pointer;
+
+  color: white;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
+
 
 .snap-v2-slot:hover {
-  border-color: rgba(0,255,220,.75);
-  background: rgba(0,255,220,.09);
+  background: rgba(0, 255, 220, 0.08);
+
+  border-color: rgba(0, 255, 220, 0.4);
 }
+
+
+.snap-v2-slot.occupied {
+  background: rgba(0, 255, 220, 0.07);
+
+  border-color: rgba(0, 255, 220, 0.28);
+}
+
 
 .snap-v2-slot.selected {
-  border-color: #00ffe0;
-  background: rgba(0,255,220,.15);
-  box-shadow: inset 0 0 0 1px rgba(0,255,220,.25);
+  background: rgba(0, 255, 220, 0.16);
+
+  border-color: rgba(0, 255, 220, 0.8);
+
+  box-shadow:
+    0 0 18px rgba(0, 255, 220, 0.12);
 }
 
-.snap-v2-slot.empty .snap-v2-empty {
-  color: rgba(255,255,255,.22);
-  font-size: 24px;
-}
 
 .snap-v2-icon {
-  display: grid;
-  place-items: center;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
 }
+
+
+.snap-v2-empty {
+  font-size: 28px;
+
+  color: rgba(255, 255, 255, 0.35);
+
+  font-weight: 300;
+}
+
 
 .snap-v2-app-dot {
   position: absolute;
-  right: 5px;
-  bottom: 5px;
-  width: 5px;
-  height: 5px;
+
+  right: 8px;
+  bottom: 8px;
+
+  width: 6px;
+  height: 6px;
+
   border-radius: 50%;
-  background: #00ffe0;
-  box-shadow: 0 0 8px rgba(0,255,224,.7);
+
+  background: #00ffdc;
+
+  box-shadow:
+    0 0 8px rgba(0, 255, 220, 0.7);
 }
 
+
+/* HELP */
+
 .snap-v2-help {
-  margin-top: 9px;
-  color: #71839b;
-  font-size: 10px;
+  margin-top: 7px;
+
   text-align: center;
+
+  font-size: 9px;
+
+  color: rgba(220,240,250,.55);
 }

@@ -94,6 +94,7 @@ export default function SnapLayoutV2({
   selectedAppId = null,
   onArrange,
   onClose,
+  anchor = null,
 }) {
   const [layoutId, setLayoutId] = React.useState("two");
   const [slots, setSlots] = React.useState({});
@@ -139,25 +140,17 @@ export default function SnapLayoutV2({
     setSlots(nextSlots);
     onArrange?.(nextSlots, nextLayout);
   };
-
-  /*
-    IMPORTANT:
-    Clicking an occupied slot when no app is selected now SELECTS that app.
-    This fixes the "clicking does nothing" behavior.
-  */
-  const selectOrMoveSlot = (slotId) => {
+ 
+   const selectOrMoveSlot = (slotId) => {
     const clickedAppId = slots[slotId] || null;
-
-    // Nothing is selected yet:
-    // clicking an occupied app selects it.
+ 
     if (!activeAppId) {
       if (clickedAppId) {
         setLocalSelectedAppId(clickedAppId);
       }
       return;
     }
-
-    // Clicking the selected app again keeps it selected.
+ 
     if (clickedAppId === activeAppId) {
       return;
     }
@@ -167,27 +160,18 @@ export default function SnapLayoutV2({
     );
 
     const next = { ...slots };
-
-    // Selected app is not currently assigned to a slot.
+ 
     if (!currentSlot) {
-      if (clickedAppId) {
-        // Swap clicked app into the old conceptual position by
-        // simply placing selected app in this slot.
-        next[slotId] = activeAppId;
-      } else {
-        next[slotId] = activeAppId;
-      }
+      next[slotId] = activeAppId;
 
       emitArrangement(next, layout);
       return;
     }
-
-    // Occupied target => swap.
+ 
     if (clickedAppId) {
       next[currentSlot] = clickedAppId;
       next[slotId] = activeAppId;
-    } else {
-      // Empty target => move.
+     } else {
       next[currentSlot] = null;
       next[slotId] = activeAppId;
     }
@@ -208,7 +192,7 @@ export default function SnapLayoutV2({
       setLocalSelectedAppId(null);
     }
   };
-
+  
   const changeLayout = (nextLayout) => {
     setLayoutId(nextLayout.id);
 
@@ -221,13 +205,47 @@ export default function SnapLayoutV2({
 
     emitArrangement(next, nextLayout);
   };
-
+  
+ const popupStyle = anchor
+  ? {
+      position: "fixed",
+      left: `${Math.max(
+        8,
+        anchor.right - 280
+      )}px`,
+      top: `${anchor.bottom + 6}px`,
+      transform: "none",
+    }
+  : {};
   return (
-    <div
-      className="vos-snap-v2"
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-    >
+     <div
+    className="vos-snap-v2"
+    style={popupStyle}
+    onMouseEnter={(e) => {
+      e.stopPropagation();
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "vos:keep-snap-layout"
+        )
+      );
+    }}
+    onMouseLeave={(e) => {
+      e.stopPropagation();
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "vos:schedule-close-snap-layout"
+        )
+      );
+    }}
+    onMouseDown={(e) =>
+      e.stopPropagation()
+    }
+    onClick={(e) =>
+      e.stopPropagation()
+    }
+  >
       <div className="snap-v2-header">
         <span>Snap Layout</span>
 
