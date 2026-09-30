@@ -16,7 +16,9 @@ const json = async (response) => {
 const get = (url, params = {}) => {
   const query = new URLSearchParams(params).toString();
 
-  return fetch(query ? `${url}?${query}` : url).then(json);
+  return fetch(
+    query ? `${url}?${query}` : url
+  ).then(json);
 };
 
 const post = (url, body) => {
@@ -30,6 +32,10 @@ const post = (url, body) => {
 };
 
 export const fsApi = {
+  // -----------------------------------------
+  // SYSTEM
+  // -----------------------------------------
+
   // System information
   system: () => get("/api/system"),
 
@@ -39,26 +45,65 @@ export const fsApi = {
   // Actual quick-access folders
   quick: () => get("/api/fs/quick"),
 
+  // -----------------------------------------
+  // FILESYSTEM
+  // -----------------------------------------
+
   // Actual filesystem directory
-  list: (path = "") => get("/api/fs/list", { path }),
+  list: (path = "") =>
+    get("/api/fs/list", { path }),
 
   // Read text file
-  read: (path) => get("/api/fs/read", { path }),
+  read: (path) =>
+    get("/api/fs/read", { path }),
 
   // Create directory
-  mkdir: (path) => post("/api/fs/mkdir", { path }),
+  mkdir: (path) =>
+    post("/api/fs/mkdir", { path }),
 
   // Rename file/folder
-  rename: (from, to) => post("/api/fs/rename", {
-    from,
-    to,
-  }),
+  rename: (from, to) =>
+    post("/api/fs/rename", {
+      from,
+      to,
+    }),
 
   // Delete file/folder
-  remove: (path) => post("/api/fs/delete", {
-    path,
-  }),
+  remove: (path) =>
+    post("/api/fs/delete", {
+      path,
+    }),
+
+  // -----------------------------------------
+  // SEARCH
+  // -----------------------------------------
+
+  // Search actual files/folders + VOS apps/settings
+  //
+  // type:
+  // "all"      -> Apps + Files + Settings
+  // "apps"     -> Apps only
+  // "files"    -> Files/folders only
+  // "settings" -> Settings only
+  //
+  search: (query, type = "all") => {
+    const value = String(query || "").trim();
+
+    if (!value) {
+      return Promise.resolve([]);
+    }
+
+    return get("/api/search", {
+      q: value,
+      type,
+      limit: 50,
+    });
+  },
 };
+
+// -----------------------------------------
+// HELPERS
+// -----------------------------------------
 
 // Bytes -> GB
 export const gb = (bytes = 0) => {
@@ -68,7 +113,9 @@ export const gb = (bytes = 0) => {
     return "0.0";
   }
 
-  return value.toFixed(value >= 10 ? 0 : 1);
+  return value.toFixed(
+    value >= 10 ? 0 : 1
+  );
 };
 
 // Bytes -> readable size

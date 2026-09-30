@@ -46,6 +46,8 @@ import {
 
  import ContextMenu from "./components/ContextMenu";
 
+ import DesktopItemMenu from "./components/DesktopItemMenu";
+
  import SettingsApp from "./components/SettingsApp";
 
  import TerminalApp from "./components/TerminalApp";
@@ -59,6 +61,8 @@ import {
  import SnapLayoutV2 from "./components/SnapLayoutV2";
 
  import { fsApi } from "./lib/fsApi";
+
+ 
 
  const SNAP_LAYOUTS = [
 
@@ -181,6 +185,23 @@ import {
  ];
 
  export default function App() {
+
+  const loadDesktopItems = async () => {
+  try {
+    const items = await fsApi.list("Desktop");
+
+    setDesktopItems(
+      items.filter((item) => item.isDir)
+    );
+  } catch (error) {
+    console.error(
+      "Failed to load Desktop:",
+      error
+    );
+
+    setDesktopItems([]);
+  }
+};
 
   const handleSnapArrange = (slots, layout) => {
 
@@ -340,15 +361,25 @@ import {
 
      const [searchOpen, setSearchOpen] = useState(false);
 
-     const [desktopItems, setDesktopItems] = useState([]);
+     const [desktopItemMenu, setDesktopItemMenu] = useState({
+      show: false,
+      x: 0,
+      y: 0,
+      item: null,
+    });
+     
 
      const [volume, setVolume] = useState(70);
-
+     
+     const [desktopItems, setDesktopItems] = useState([]);
+     
      const [wifi, setWifi] = useState(true);
 
      const [airplane, setAirplane] = useState(false);
 
      const [analysis, setAnalysis] = useState(null);
+
+     const [refreshing, setRefreshing] = useState(false);
 
      const [ctx, setCtx] = useState({
 
@@ -361,7 +392,7 @@ import {
      });
 
      const [snapLayoutOpen, setSnapLayoutOpen] = useState(false);
-
+     
      const [selectedAppId, setSelectedAppId] = useState(null);
 
      const [snapAnchor, setSnapAnchor] = useState(null);
@@ -471,32 +502,79 @@ import {
        },
 
      });
+  const openDesktopItemMenu = (event, item) => {
+    event.stopPropagation();
+  
+    const menuWidth = 230;
+    const menuHeight = 300;
+  
+    const x = Math.min(
+      event.clientX + 8,
+      window.innerWidth - menuWidth - 8
+    );
+  
+    const y = Math.min(
+      event.clientY + 8,
+      window.innerHeight - menuHeight - 70
+    );
+  
+    setDesktopItemMenu({
+      show: true,
+      x: Math.max(8, x),
+      y: Math.max(66, y),
+      item,
+    });
+  
+    closeContext?.();
+  };
+  
+  const closeDesktopItemMenu = () => {
+    setDesktopItemMenu({
+      show: false,
+      x: 0,
+      y: 0,
+      item: null,
+    });
+  };
+  
+useEffect(() => {
+  const refreshDesktop = async () => {
+    try {
+      const items = await fsApi.list("Desktop");
 
-  const loadDesktopItems = async () => {
+      const folders = items.filter(
+        (item) => item.isDir
+      );
 
-       try {
+      setDesktopItems(folders);
+    } catch (error) {
+      console.error(
+        "Failed to refresh VOS Desktop:",
+        error
+      );
+    }
+  };
 
-        const items = await fsApi.list("Desktop");
+  // Initial desktop load
+  refreshDesktop();
 
-        setDesktopItems(
+  // New Folder / Rename / Delete / Refresh
+  const handleRefresh = () => {
+    refreshDesktop();
+  };
 
-         items.filter((item) => item.isDir)
+  window.addEventListener(
+    "vos:filesystem-refresh",
+    handleRefresh
+  );
 
-        );
-
-      } catch (error) {
-
-       console.error(
-
-        "Failed to load Desktop:",
-
-         error
-
-       );
-
-       setDesktopItems([]);
-      }
-    };
+  return () => {
+    window.removeEventListener(
+      "vos:filesystem-refresh",
+      handleRefresh
+    );
+  };
+}, []);
 
      const [topZ, setTopZ] = useState(105);
 
@@ -821,38 +899,29 @@ import {
   }, [runningApps, windows]);
 
   // DESKTOP FILESYSTEM REFRESH
+ 
 
-  useEffect(() => {
+ useEffect(() => {
+  const handleRefreshStatus = () => {
+    setRefreshing(true);
 
-    loadDesktopItems();
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 700);
+  };
 
-    const handleRefresh = () => {
+  window.addEventListener(
+    "vos:show-refresh-status",
+    handleRefreshStatus
+  );
 
-      loadDesktopItems();
-
-    };
-
-    window.addEventListener(
-
-      "vos:filesystem-refresh",
-
-      handleRefresh
-
+  return () => {
+    window.removeEventListener(
+      "vos:show-refresh-status",
+      handleRefreshStatus
     );
-
-    return () => {
-
-      window.removeEventListener(
-
-        "vos:filesystem-refresh",
-
-        handleRefresh
-
-      );
-
-    };
-
-  }, []);
+  };
+}, []);
 
   // SNAP LAYOUT EVENTS
 
@@ -1007,6 +1076,24 @@ import {
   // ALT + TAB
 
   useEffect(() => {
+  const handleOpenComputer = () => {
+    openComputer();
+  };
+
+  window.addEventListener(
+    "vos:open-computer",
+    handleOpenComputer
+  );
+
+  return () => {
+    window.removeEventListener(
+      "vos:open-computer",
+      handleOpenComputer
+    );
+  };
+}, []);
+
+  useEffect(() => {
 
     const handleAltTab = (e) => {
 
@@ -1127,21 +1214,27 @@ import {
          className={`desktop ${theme}`}
 
          onContextMenu={openContext}
+onClick={(e) => {
+  // Ignore clicks coming from desktop icons,
+  // taskbar, windows, buttons, etc.
+  const clickedDesktop =
+    e.target === e.currentTarget ||
+    e.target.classList?.contains("wallpaper");
 
-         onClick={(e) => {
+  if (!clickedDesktop) {
+    return;
+  }
 
-           if (e.target === e.currentTarget) {
-
-             closeContext();
-
-             setMenu(false);
-
-           }
-
-         }}
+  // LEFT CLICK on empty desktop
+  openContext(e);
+}}
 
        >
-
+        {refreshing && (
+      <div className="vos-refresh-status">
+        Refreshing...
+      </div>
+       )}
          <img
 
            src={wallpaper}
@@ -1220,45 +1313,30 @@ import {
 
          />
 
-       {desktopItems.map((item) => (
+{desktopItems.map((item) => (
+  <DesktopIcon
+    key={item.name}
+    icon={Folder}
+    name={item.name}
 
-    <DesktopIcon
+    onOpen={() => {
+      openExplorer();
 
-      key={item.name}
+      window.dispatchEvent(
+        new CustomEvent("vos:open-folder", {
+          detail: {
+            path: `Desktop/${item.name}`,
+          },
+        })
+      );
+    }}
 
-      icon={Folder}
-
-      name={item.name}
-
-      onOpen={() => {
-
-        openExplorer();
-
-        window.dispatchEvent(
-
-          new CustomEvent(
-
-            "vos:open-folder",
-
-            {
-
-              detail: {
-
-                path: `Desktop/${item.name}`,
-
-              },
-
-            }
-
-          )
-
-        );
-
-      }}
-
-    />
-
-  ))}</div>
+    onMenu={(event) => {
+      openDesktopItemMenu(event, item);
+    }}
+  />
+))}
+</div>
 
        {search !== "" && !searchOpen && (
 
@@ -1321,7 +1399,21 @@ import {
            />
 
        )}
-
+        {desktopItemMenu.show && desktopItemMenu.item && (
+  <DesktopItemMenu
+    x={desktopItemMenu.x}
+    y={desktopItemMenu.y}
+    item={desktopItemMenu.item}
+    close={closeDesktopItemMenu}
+    onRefresh={() => {
+      window.dispatchEvent(
+        new CustomEvent("vos:filesystem-refresh")
+      );
+    }}
+    openExplorer={openExplorer}
+    openTerminal={openTerminal}
+  />
+)}
        {ctx.show && (
 
          <ContextMenu
@@ -1349,7 +1441,7 @@ import {
         />
 
        )}
-
+        
         {windows.explorer.open &&
 
          !windows.explorer.minimized && (

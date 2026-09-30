@@ -32,11 +32,7 @@ export default function ContextMenu({
 
   useEffect(() => {
     const outside = (event) => {
-      if (
-        !menuRef.current?.contains(
-          event.target
-        )
-      ) {
+      if (!menuRef.current?.contains(event.target)) {
         close?.();
       }
     };
@@ -82,8 +78,6 @@ export default function ContextMenu({
       return;
     }
 
-    // Windows-invalid characters:
-    // < > : " / \ | ? *
     if (/[<>:"/\\|?*]/.test(name)) {
       setError(
         'Invalid folder name. Avoid: < > : " / \\ | ? *'
@@ -95,20 +89,25 @@ export default function ContextMenu({
       setCreating(true);
       setError("");
 
-      // Creates folder inside the real Windows Desktop
       await fsApi.mkdir(
         `Desktop/${name}`
       );
 
-      // Tell App.jsx to reload desktop folders
       window.dispatchEvent(
         new CustomEvent(
           "vos:filesystem-refresh"
         )
       );
 
-      setShowNewFolder(false);
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent(
+            "vos:filesystem-refresh"
+          )
+        );
+      }, 250);
 
+      setShowNewFolder(false);
       close?.();
     } catch (err) {
       console.error(
@@ -137,6 +136,12 @@ export default function ContextMenu({
     );
 
     onRefresh?.();
+
+    window.dispatchEvent(
+      new CustomEvent(
+        "vos:show-refresh-status"
+      )
+    );
 
     close?.();
   };
@@ -220,7 +225,7 @@ export default function ContextMenu({
   }
 
   // --------------------------------------------------
-  // MAIN CONTEXT MENU
+  // DESKTOP CONTEXT MENU
   // --------------------------------------------------
 
   return (

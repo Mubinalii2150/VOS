@@ -195,6 +195,219 @@ const routes = {
     return found;
   },
 
+  "GET /api/search": async (_req, query) => {
+  const q = (query.get("q") || "").trim().toLowerCase();
+  const type = query.get("type") || "all";
+  const limit = Math.min(
+    Math.max(Number(query.get("limit") || 50), 1),
+    100
+  );
+
+  if (!q) {
+    return [];
+  }
+
+  const results = [];
+
+  const addResult = (item) => {
+    if (results.length >= limit) return;
+
+    results.push(item);
+  };
+
+  // -----------------------------
+  // VOS APPS
+  // -----------------------------
+  const apps = [
+    {
+      id: "explorer",
+      name: "Files",
+      type: "app",
+      description: "File Explorer",
+    },
+    {
+      id: "computer",
+      name: "Computer",
+      type: "app",
+      description: "This PC",
+    },
+    {
+      id: "settings",
+      name: "Settings",
+      type: "app",
+      description: "VOS Settings",
+    },
+    {
+      id: "terminal",
+      name: "Terminal",
+      type: "app",
+      description: "Phoenix Terminal",
+    },
+    {
+      id: "extractor",
+      name: "Extractor",
+      type: "app",
+      description: "File Extractor",
+    },
+  ];
+
+  if (type === "all" || type === "apps") {
+    for (const app of apps) {
+      if (
+        app.name.toLowerCase().includes(q) ||
+        app.description.toLowerCase().includes(q)
+      ) {
+        addResult(app);
+      }
+    }
+  }
+
+  // -----------------------------
+  // VOS SETTINGS
+  // -----------------------------
+  const settings = [
+    {
+      id: "display",
+      name: "Display Settings",
+      type: "setting",
+      description: "Wallpaper, theme and display",
+    },
+    {
+      id: "personalization",
+      name: "Personalization",
+      type: "setting",
+      description: "Theme and wallpaper",
+    },
+    {
+      id: "network",
+      name: "Network & Wi-Fi",
+      type: "setting",
+      description: "Wi-Fi and network settings",
+    },
+    {
+      id: "sound",
+      name: "Sound",
+      type: "setting",
+      description: "Volume and audio settings",
+    },
+    {
+      id: "system",
+      name: "System",
+      type: "setting",
+      description: "System information",
+    },
+  ];
+
+  if (type === "all" || type === "settings") {
+    for (const setting of settings) {
+      if (
+        setting.name.toLowerCase().includes(q) ||
+        setting.description.toLowerCase().includes(q)
+      ) {
+        addResult(setting);
+      }
+    }
+  }
+
+  // -----------------------------
+  // FILE SEARCH
+  // -----------------------------
+  if (type === "all" || type === "files") {
+    const roots = [
+      {
+        real: DESKTOP_ROOT,
+        virtual: "Desktop",
+      },
+      {
+        real: path.join(ROOT, "Documents"),
+        virtual: "Documents",
+      },
+      {
+        real: path.join(ROOT, "Downloads"),
+        virtual: "Downloads",
+      },
+    ];
+
+    const ignored = new Set([
+      "node_modules",
+      ".git",
+      ".cache",
+      "AppData",
+      "System Volume Information",
+      "$Recycle.Bin",
+    ]);
+
+    const scan = async (realDir, virtualDir, depth = 0) => {
+      if (results.length >= limit) return;
+
+      // Prevent extremely deep scans
+      if (depth > 6) return;
+
+      let entries;
+
+      try {
+        entries = await fs.readdir(realDir, {
+          withFileTypes: true,
+        });
+      } catch {
+        return;
+      }
+
+      for (const entry of entries) {
+        if (results.length >= limit) return;
+
+        if (ignored.has(entry.name)) {
+          continue;
+        }
+
+        const realPath = path.join(
+          realDir,
+          entry.name
+        );
+
+        const virtualPath =
+          `${virtualDir}/${entry.name}`;
+
+        if (
+          entry.name
+            .toLowerCase()
+            .includes(q)
+        ) {
+          addResult({
+            name: entry.name,
+            type: entry.isDirectory()
+              ? "folder"
+              : "file",
+            path: virtualPath,
+            description: entry.isDirectory()
+              ? "Folder"
+              : "File",
+          });
+        }
+
+        if (entry.isDirectory()) {
+          await scan(
+            realPath,
+            virtualPath,
+            depth + 1
+          );
+        }
+      }
+    };
+
+    for (const root of roots) {
+      if (results.length >= limit) break;
+
+      await scan(
+        root.real,
+        root.virtual
+      );
+    }
+  }
+
+  return results;
+ },
+
   // --------------------------------------------------
   // LIST DIRECTORY
   // --------------------------------------------------
