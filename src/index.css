@@ -26,9 +26,7 @@ body{
   height:30px;
 }
 
-.icon{
-  font-size:46px;
-}
+
 
 /* ---------- Taskbar ---------- */
 
@@ -152,9 +150,7 @@ body{
   background:#ef4444 !important;
 }
 
-.window-body{
-  height:calc(100% - 48px);
-}
+
 
 /* ---------- Explorer ---------- */
 
@@ -246,34 +242,180 @@ body{
   width:calc(100vw - 16px) !important;
   height:calc(100vh - 130px) !important;
 }
-.context-menu{
-  position:absolute;
 
-  width:220px;
+.context-menu {
+  position: fixed;
+  z-index: 999999;
 
-  padding:8px;
+  width: 220px;
+  padding: 10px;
 
-  border-radius:16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
 
-  background:rgba(15,23,42,.94);
-  backdrop-filter:blur(30px);
+  background: rgba(9, 22, 45, 0.96);
 
-  border:1px solid rgba(255,255,255,.08);
+  border: 1px solid rgba(0, 255, 220, 0.12);
+  border-radius: 12px;
 
-  color:white;
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.45),
+    0 5px 15px rgba(0, 0, 0, 0.25);
 
-  z-index:9999;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  box-sizing: border-box;
 }
 
-.context-item{
-  padding:10px 12px;
-  border-radius:10px;
-  cursor:pointer;
+.context-item {
+  min-width: 0;
+  height: 58px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 5px;
+
+  padding: 7px 10px;
+
+  border: 0;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: #eefaff;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  text-align: left;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
-.context-item:hover{
-  background:rgba(255,255,255,.08);
+.context-item svg {
+  flex-shrink: 0;
+
+  color: #dcecff;
 }
+
+.context-item:hover {
+  background: rgba(0, 255, 220, 0.10);
+  color: #ffffff;
+}
+
+.context-item:hover svg {
+  color: #00ffdc;
+}
+
+/* Display Settings = full width */
+
+.context-item:last-child {
+  grid-column: 1 / -1;
+
+  height: 48px;
+
+  flex-direction: row;
+  align-items: center;
+
+  gap: 9px;
+}
+
+
+/* New Folder dialog */
+
+.new-folder-dialog {
+  display: block;
+
+  width: 250px;
+
+  padding: 14px;
+}
+
+.context-dialog-title {
+  margin-bottom: 10px;
+
+  color: #eefaff;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.context-folder-input {
+  width: 100%;
+  height: 36px;
+
+  padding: 0 10px;
+
+  box-sizing: border-box;
+
+  border: 1px solid rgba(0, 255, 220, 0.18);
+  border-radius: 7px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #ffffff;
+
+  font-family: inherit;
+}
+
+.context-folder-input:focus {
+  border-color: rgba(0, 255, 220, 0.55);
+}
+
+.context-error {
+  margin-top: 7px;
+
+  color: #ff8f8f;
+
+  font-size: 11px;
+}
+
+.context-dialog-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 7px;
+
+  margin-top: 12px;
+}
+
+.context-dialog-actions button {
+  height: 32px;
+
+  padding: 0 12px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: #eafaff;
+
+  cursor: pointer;
+}
+
+.context-dialog-actions button:hover {
+  background: rgba(0, 255, 220, 0.12);
+}
+
+.context-dialog-actions button:last-child {
+  background: rgba(0, 255, 220, 0.15);
+  color: #00ffdc;
+}
+
 .boot{
   position:absolute;
   border-radius:30px;
@@ -1362,11 +1504,7 @@ height:70px;
   color:#fff;
 }
 
-.window-body{
-  height:calc(100% - 48px);
-  overflow:auto;
-  background:#07162D;
-}
+
 .search{
   flex:1;
   height:42px;
@@ -1993,9 +2131,9 @@ height:70px;
 
   background: linear-gradient(
     90deg,
-    rgba(18,108,122,.96),
-    rgba(40,132,140,.95),
-    rgba(18,108,122,.96)
+    rgba(18, 108, 122, 0.461),
+    rgba(18, 108, 122, 0.461),
+    rgba(18,108,122,0.461)
   );
 
   backdrop-filter: blur(18px);
@@ -2513,10 +2651,7 @@ height:70px;
    VOS FILE EXPLORER
 ========================= */
 
-.window-body{
-  height:calc(100% - 48px);
-  overflow:hidden;
-}
+
 
 .explorer{
   width:100%;
@@ -4278,27 +4413,40 @@ height:70px;
   background:#12304f;
 }
 /* ================= TASKBAR ================= */
+
 .taskbar{
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  height: 58px;
+  position:fixed !important;
 
-  display: grid;
-  grid-template-columns: 58px 1fr auto auto;
-  align-items: center;
-  gap: 10px;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
 
-  padding: 0 12px;
-  box-sizing: border-box;
+  width:100% !important;
+  max-width:none !important;
 
-  background: rgba(9,22,45,.96);
-  backdrop-filter: blur(18px);
-  border-top: 1px solid rgba(0,255,220,.12);
+  height:58px !important;
+  min-height:58px !important;
 
-  z-index: 9999;
+  margin:0;
+  padding:0 12px;
+
+  display:flex;
+  align-items:center;
+  gap:14px;
+
+  box-sizing:border-box;
+
+  z-index:99999 !important;
+
+  background:rgba(9,22,45,.94);
+  backdrop-filter:blur(18px);
+
+  border:1px solid rgba(0,255,220,.15);
+  border-radius:0;
+
+  overflow:hidden;
 }
+
 .phoenix-btn{
   width:46px;
   height:46px;
@@ -4535,11 +4683,6 @@ height:70px;
   overflow:hidden;
 }
 
-.desktop-icon{
-  width:72px;
-  align-items:center;
-}
-
 .icon-box{
   width:56px;
   height:56px;
@@ -4588,17 +4731,6 @@ height:70px;
 /* =========================
    WINDOW SYSTEM
 ========================= */
-.window{
-  position:fixed;
-  top:58px;          /* TopBar ke niche exactly */
-  left:0;
-  width:100vw;
-  height:calc(100vh - 116px); /* 58 top + 58 taskbar */
-
-  margin:0;
-  border-radius:0;
-  overflow:hidden;
-}
 /* Maximized */
 .window.maximized{
   top: 58px;
@@ -4676,13 +4808,7 @@ height:70px;
 }
 
 /* Body */
-.window-body{
-  height:calc(100% - 40px);
-  margin:0;
-  padding:18px;
-  overflow:auto;
-  box-sizing:border-box;
-}
+
 /* Scrollbar */
 .window-body::-webkit-scrollbar{
   width:8px;
@@ -4796,19 +4922,29 @@ height:70px;
 
 /* Open windows */
 .window{
-  position: fixed;
-  top: 58px;
-  left: 0;
+  position:absolute;
 
-  width: 100vw;
-  height: calc(100vh - 116px);
+  top:58px;
+  left:160px;
 
-  background: #04152d;
-  border: none;
-  border-radius: 0;
+  width:calc(100vw - 180px);
 
-  overflow: hidden;
-  z-index: 200;        /* Icons ke upar */
+  /* Topbar 58px + Taskbar 58px */
+  height:calc(100vh - 116px);
+
+  max-height:calc(100vh - 116px);
+
+  background:#04152d;
+  border:1px solid rgba(0,255,220,.12);
+  border-radius:0;
+
+  overflow:hidden;
+  box-sizing:border-box;
+
+  display:flex;
+  flex-direction:column;
+
+  z-index:30;
 }
 
 /* Top bar */
@@ -5089,15 +5225,15 @@ height:70px;
   color: #fff;
 }
 
-.window-body {
-  width: 100%;
-  flex: 1;
-  min-height: 0;
+.window-body{
+  width:100%;
+  flex:1;
+  min-height:0;
 
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-y:auto;
+  overflow-x:hidden;
 
-  box-sizing: border-box;
+  box-sizing:border-box;
 }
 
 .window.maximized {
@@ -5384,4 +5520,60 @@ height:70px;
   font-size: 9px;
 
   color: rgba(220,240,250,.55);
+}
+.icons{
+  position:absolute;
+  top:88px;
+  left:22px;
+  right:22px;
+
+  display:grid;
+
+  /* Windows-style: left → right, then next row */
+  grid-template-columns:repeat(auto-fill, 88px);
+  grid-auto-rows:78px;
+
+  column-gap:8px;
+  row-gap:8px;
+
+  align-content:start;
+  justify-content:start;
+
+  width:calc(100vw - 44px);
+  height:calc(100vh - 88px - 58px);
+  max-height:calc(100vh - 88px - 58px);
+
+  box-sizing:border-box;
+
+  z-index:5;
+
+  /* No scrollbar */
+  overflow:hidden;
+}
+
+.desktop-icon{
+  width:78px;
+  height:70px;
+  padding: 20px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+
+  box-sizing:border-box;
+
+  text-align:center;
+  overflow:visible;
+}
+
+.taskbar .search-bar{
+  flex:1;
+  min-width:0;
+  height:42px;
+}
+
+.taskbar .search-box{
+  flex:1;
+  min-width:0;
+  height:42px;
 }

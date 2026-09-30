@@ -4,7 +4,7 @@ export default function BootScreen({ finish }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       finish();
-    }, 3000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, []);
