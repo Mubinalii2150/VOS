@@ -6,14 +6,17 @@ export default function DesktopIcon({
   onOpen,
   onMenu,
 }) {
+  // LEFT CLICK = OPEN
   const handleClick = (event) => {
     event.stopPropagation();
     onOpen?.();
   };
 
+  // RIGHT CLICK = ITEM MENU
   const handleContextMenu = (event) => {
     event.preventDefault();
     event.stopPropagation();
+
     onMenu?.(event);
   };
 
@@ -24,7 +27,10 @@ export default function DesktopIcon({
       onContextMenu={handleContextMenu}
     >
       <div className="icon-box">
-        <Icon size={34} strokeWidth={1.8} />
+        <Icon
+          size={34}
+          strokeWidth={1.8}
+        />
       </div>
 
       <span>{name}</span>

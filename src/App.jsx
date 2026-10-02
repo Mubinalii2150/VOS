@@ -15,7 +15,9 @@ import {
    FolderOpen,
 
    Folder,
-
+   
+   File,
+   
    Monitor,
 
    Settings,
@@ -186,22 +188,6 @@ import {
 
  export default function App() {
 
-  const loadDesktopItems = async () => {
-  try {
-    const items = await fsApi.list("Desktop");
-
-    setDesktopItems(
-      items.filter((item) => item.isDir)
-    );
-  } catch (error) {
-    console.error(
-      "Failed to load Desktop:",
-      error
-    );
-
-    setDesktopItems([]);
-  }
-};
 
   const handleSnapArrange = (slots, layout) => {
 
@@ -362,16 +348,15 @@ import {
      const [searchOpen, setSearchOpen] = useState(false);
 
      const [desktopItemMenu, setDesktopItemMenu] = useState({
-      show: false,
-      x: 0,
-      y: 0,
-      item: null,
+       show: false,
+       x: 0,
+       y: 0,
+       item: null,
+       kind: "folder",
     });
      
 
      const [volume, setVolume] = useState(70);
-     
-     const [desktopItems, setDesktopItems] = useState([]);
      
      const [wifi, setWifi] = useState(true);
 
@@ -380,6 +365,46 @@ import {
      const [analysis, setAnalysis] = useState(null);
 
      const [refreshing, setRefreshing] = useState(false);
+
+    const [desktopItems, setDesktopItems] = useState([]);
+
+    const loadDesktopItems = async () => {
+  try {
+    const items = await fsApi.list("Desktop");
+
+    // Files + folders dono desktop par maintain karo
+    setDesktopItems(items);
+  } catch (error) {
+    console.error(
+      "Failed to load VOS Desktop:",
+      error
+    );
+
+    // IMPORTANT:
+    // Error par existing icons ko empty mat karo.
+    // Isse delete ke baad sab icons disappear nahi honge.
+  }
+};
+
+useEffect(() => {
+  loadDesktopItems();
+
+  const handleRefresh = () => {
+    loadDesktopItems();
+  };
+
+  window.addEventListener(
+    "vos:filesystem-refresh",
+    handleRefresh
+  );
+
+  return () => {
+    window.removeEventListener(
+      "vos:filesystem-refresh",
+      handleRefresh
+    );
+  };
+}, []);
 
      const [ctx, setCtx] = useState({
 
@@ -502,7 +527,7 @@ import {
        },
 
      });
-  const openDesktopItemMenu = (event, item) => {
+  const openDesktopItemMenu = (event, item, kind = "folder") => {
     event.stopPropagation();
   
     const menuWidth = 230;
@@ -518,12 +543,13 @@ import {
       window.innerHeight - menuHeight - 70
     );
   
-    setDesktopItemMenu({
-      show: true,
-      x: Math.max(8, x),
-      y: Math.max(66, y),
-      item,
-    });
+   setDesktopItemMenu({
+  show: true,
+  x: Math.max(8, x),
+  y: Math.max(66, y),
+  item,
+  kind,
+});
   
     closeContext?.();
   };
@@ -536,47 +562,9 @@ import {
       item: null,
     });
   };
-  
-useEffect(() => {
-  const refreshDesktop = async () => {
-    try {
-      const items = await fsApi.list("Desktop");
 
-      const folders = items.filter(
-        (item) => item.isDir
-      );
 
-      setDesktopItems(folders);
-    } catch (error) {
-      console.error(
-        "Failed to refresh VOS Desktop:",
-        error
-      );
-    }
-  };
-
-  // Initial desktop load
-  refreshDesktop();
-
-  // New Folder / Rename / Delete / Refresh
-  const handleRefresh = () => {
-    refreshDesktop();
-  };
-
-  window.addEventListener(
-    "vos:filesystem-refresh",
-    handleRefresh
-  );
-
-  return () => {
-    window.removeEventListener(
-      "vos:filesystem-refresh",
-      handleRefresh
-    );
-  };
-}, []);
-
-     const [topZ, setTopZ] = useState(105);
+  const [topZ, setTopZ] = useState(105);
 
      const bringToFront = (id) => {
 
@@ -1260,65 +1248,93 @@ onClick={(e) => {
            setAirplane={setAirplane}
 
          />
+         <div className="icons">
 
-       <div className="icons">
+        <DesktopIcon
+  icon={FolderOpen}
+  name="Files"
+  onOpen={openExplorer}
+  onMenu={(event) => {
+    openDesktopItemMenu(
+      event,
+      {
+        name: "Files",
+        path: "VOS://Files",
+      },
+      "app"
+    );
+  }}
+/>            
+         
+<DesktopIcon
+  icon={Monitor}
+  name="Computer"
+  onOpen={openComputer}
+  onMenu={(event) => {
+    openDesktopItemMenu(
+      event,
+      {
+        name: "Computer",
+        path: "VOS://Computer",
+      },
+      "app"
+    );
+  }}
+/>
+           
+ <DesktopIcon
+  icon={Settings}
+  name="Settings"
+  onOpen={openSettings}
+  onMenu={(event) => {
+    openDesktopItemMenu(
+      event,
+      {
+        name: "Settings",
+        path: "VOS://Settings",
+      },
+      "app"
+    );
+  }}
+/>
 
-         <DesktopIcon
+<DesktopIcon
+  icon={Terminal}
+  name="Terminal"
+  onOpen={openTerminal}
+  onMenu={(event) => {
+    openDesktopItemMenu(
+      event,
+      {
+        name: "Terminal",
+        path: "VOS://Terminal",
+      },
+      "app"
+    );
+  }}
+/>
 
-           icon={FolderOpen}
-
-           name="Files"
-
-           onOpen={openExplorer}
-
-         />
-
-         <DesktopIcon
-
-           icon={Monitor}
-
-           name="Computer"
-
-           onOpen={openComputer}
-
-         />
-
-         <DesktopIcon
-
-           icon={Settings}
-
-           name="Settings"
-
-           onOpen={openSettings}
-
-         />
-
-         <DesktopIcon
-
-           icon={Terminal}
-
-           name="Terminal"
-
-           onOpen={openTerminal}
-
-         />
-
-         <DesktopIcon
-
-           icon={Archive}
-
-           name="Extractor"
-
-           onOpen={openExtractor}
-
-         />
+<DesktopIcon
+  icon={Archive}
+  name="Extractor"
+  onOpen={openExtractor}
+  onMenu={(event) => {
+    openDesktopItemMenu(
+      event,
+      {
+        name: "Extractor",
+        path: "VOS://Extractor",
+      },
+      "app"
+    );
+  }}
+/>
 
 {desktopItems.map((item) => (
   <DesktopIcon
-    key={item.name}
-    icon={Folder}
+    key={`${item.isDir ? "folder" : "file"}-${item.name}`}
+    icon={item.isDir ? Folder : File}
     name={item.name}
-
     onOpen={() => {
       openExplorer();
 
@@ -1330,13 +1346,18 @@ onClick={(e) => {
         })
       );
     }}
-
     onMenu={(event) => {
-      openDesktopItemMenu(event, item);
+      openDesktopItemMenu(
+        event,
+        item,
+        item.isDir ? "folder" : "file"
+      );
     }}
   />
 ))}
+
 </div>
+
 
        {search !== "" && !searchOpen && (
 
@@ -1399,21 +1420,20 @@ onClick={(e) => {
            />
 
        )}
-        {desktopItemMenu.show && desktopItemMenu.item && (
-  <DesktopItemMenu
-    x={desktopItemMenu.x}
-    y={desktopItemMenu.y}
-    item={desktopItemMenu.item}
-    close={closeDesktopItemMenu}
-    onRefresh={() => {
-      window.dispatchEvent(
-        new CustomEvent("vos:filesystem-refresh")
-      );
-    }}
-    openExplorer={openExplorer}
-    openTerminal={openTerminal}
-  />
-)}
+
+     {desktopItemMenu.show &&
+  desktopItemMenu.item && (
+    <DesktopItemMenu
+      x={desktopItemMenu.x}
+      y={desktopItemMenu.y}
+      item={desktopItemMenu.item}
+      kind={desktopItemMenu.kind}
+      close={closeDesktopItemMenu}
+      onRefresh={loadDesktopItems}
+      openExplorer={openExplorer}
+      openTerminal={openTerminal}
+    />
+  )}
        {ctx.show && (
 
          <ContextMenu

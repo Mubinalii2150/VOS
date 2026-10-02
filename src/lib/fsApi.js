@@ -31,75 +31,38 @@ const post = (url, body) => {
   }).then(json);
 };
 
-export const fsApi = {
-  // -----------------------------------------
-  // SYSTEM
-  // -----------------------------------------
+  export const fsApi = {
+    system: () => get("/api/system"),
+    drives: () => get("/api/drives"),
+    quick: () => get("/api/fs/quick"),
+    list: (path = "") =>
+      get("/api/fs/list", { path }),
+    read: (path) =>
+      get("/api/fs/read", { path }),
+  
+    mkdir: (path) =>
+      post("/api/fs/mkdir", { path }),  
 
-  // System information
-  system: () => get("/api/system"),
-
-  // Windows drives
-  drives: () => get("/api/drives"),
-
-  // Actual quick-access folders
-  quick: () => get("/api/fs/quick"),
-
-  // -----------------------------------------
-  // FILESYSTEM
-  // -----------------------------------------
-
-  // Actual filesystem directory
-  list: (path = "") =>
-    get("/api/fs/list", { path }),
-
-  // Read text file
-  read: (path) =>
-    get("/api/fs/read", { path }),
-
-  // Create directory
-  mkdir: (path) =>
-    post("/api/fs/mkdir", { path }),
-
-  // Rename file/folder
-  rename: (from, to) =>
-    post("/api/fs/rename", {
-      from,
-      to,
-    }),
-
-  // Delete file/folder
-  remove: (path) =>
-    post("/api/fs/delete", {
+      createFile: (path, content = "") =>
+    post("/api/fs/create-file", {
       path,
+      content,
     }),
-
-  // -----------------------------------------
-  // SEARCH
-  // -----------------------------------------
-
-  // Search actual files/folders + VOS apps/settings
-  //
-  // type:
-  // "all"      -> Apps + Files + Settings
-  // "apps"     -> Apps only
-  // "files"    -> Files/folders only
-  // "settings" -> Settings only
-  //
-  search: (query, type = "all") => {
-    const value = String(query || "").trim();
-
-    if (!value) {
-      return Promise.resolve([]);
-    }
-
-    return get("/api/search", {
-      q: value,
-      type,
-      limit: 50,
-    });
-  },
-};
+   rename: (from, to) =>
+      post("/api/fs/rename", {
+        from,
+        to,
+      }),
+  
+    remove: (path) =>
+      post("/api/fs/delete", { path }),
+  
+    compress: (path, format) =>
+      post("/api/fs/compress", {
+        path,
+        format,
+      }),
+  };
 
 // -----------------------------------------
 // HELPERS

@@ -477,9 +477,21 @@ const routes = {
     };
   },
 
+
   // --------------------------------------------------
   // CREATE FOLDER
   // --------------------------------------------------
+
+  "POST /api/fs/touch": async (_req, _query, body) => {
+  const file = safe(body.path);
+
+  await fs.writeFile(file, "", {
+    flag: "wx",
+  });
+
+  return { ok: true };
+},
+
 
   "POST /api/fs/mkdir": async (_req, _query, body) => {
     await fs.mkdir(
@@ -493,6 +505,27 @@ const routes = {
       ok: true,
     };
   },
+
+  
+  "POST /api/fs/create-file": async (_req, _query, body) => {
+  const filePath = safe(body.path);
+
+  await fs.writeFile(
+    filePath,
+    body.content ?? "",
+    {
+      encoding: "utf8",
+      flag: "wx",
+    }
+  );
+
+  return {
+    ok: true,
+    path: filePath,
+  };
+},
+
+
 
   // --------------------------------------------------
   // RENAME
