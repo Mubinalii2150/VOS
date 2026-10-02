@@ -1,1 +1,0 @@
-export default function InterleavingCard({data}){return <section className="card"><h3>Interleaving</h3><p>{data.status}</p><div>{data.tested_methods?.join(" • ")}</div></section>}
